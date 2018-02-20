@@ -3,19 +3,21 @@ var wpi = require('wiring-pi');
 wpi.setup('wpi');
 
 //pins
-var pin = 5;
-
+var pin = 7;
 
 wpi.pinMode(pin, wpi.OUTPUT);
 
-setInterval(readPin(pin), 1000);
+var value = 0;
+setInterval(function() {
+	wpi.digitalWrite(pin, value);
+value = +!value;
+readPin(pin);
+}, 500);
 
-function readPin(pin) {
-    var state = wpi.digitalRead(this.pin);
-
-    var stringBuilder = {"messageId": 1, "pin": this.pin, "state":state}
-
-    var json = JSON.stringify(jsonBuilder);
-    console.log(json);
-    //return json;
+function readPin(inputPin) {
+	var state = wpi.digitalRead(inputPin);
+	var stringBuilder = {"messageId":1, "pin": inputPin, "state":state};
+	var json = JSON.stringify(stringBuilder);
+	console.log(json);
 }
+	
