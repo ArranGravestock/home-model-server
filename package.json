@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ArranGravestock/home-model-server#readme",
   "dependencies": {
+    "r-pi-usonic": "^2.5.0",
     "wiring-pi": "^2.2.1"
   }
 }
