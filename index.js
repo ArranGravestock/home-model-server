@@ -1,7 +1,7 @@
 //run setups
 var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
-//var usonic = require('r-pi-usonic');
+var usonic = require('r-pi-usonic');
 wpi.setup('wpi');
 
 
@@ -9,7 +9,7 @@ wpi.setup('wpi');
 var ledpin = 7;
 var trigpin = 11;
 var echopin = 12;
-var dhtpin = 0; //temp
+var motion = 16	;
 
 //voltage init
 var LOW = 0;
@@ -19,6 +19,29 @@ var HIGH = 1;
 wpi.pinMode(ledpin, wpi.OUTPUT);
 wpi.pinMode(trigpin, wpi.OUTPUT);
 wpi.pinMode(echopin, wpi.INPUT);
+wpi.pinMode(motion, wpi.INPUT);
+
+function readMotion() {
+	if (wpi.digitalRead(motion)) {
+		console.log(wpi.digitalRead(motion));	
+		console.log("motion detected");
+	} else {
+		console.log("no motion");
+	}
+	wpi.delay(5000);
+}
+
+usonic.init(function (error) {
+	if (error) {
+		console.log(error);
+	} else {
+		var sensor = usonic.createSensor(echopin, trigpin, 450);
+		setInterval(function() {
+			var distance = sensor();
+//			console.log(distance);
+		}, 500);
+	}
+});
 
 function readUsonicSensor() {
 	wpi.digitalWrite(trigpin, 0);
@@ -39,11 +62,7 @@ setInterval(function() {
 	wpi.digitalWrite(ledpin, value);
 	value = +!value;
 
-
-	var usonicDistance = readUsonicSensor();
-	console.log(usonicDistance);
-
-	sensordht.read();
+	readMotion();	
 }, 500);
 
 function readPin(inputPin) {
@@ -56,24 +75,37 @@ function readPin(inputPin) {
 function initUsonicSensor() {
 	var sensor = usonic.createSensor(echopin, trigpin, 450);
 	
-	setTimeout(function() { console.log(sensor().toFixed(2)) }, 60);
+//	setTimeout(function() { console.log(sensor().toFixed(2)) }, 60);
 };
 	
 var sensordht = {
 	sensors: [{
 		name: "dht",
 		type: 11,
-		pin: 8
+		pin: 2
 	}],
 	read: function() {
 		for (var a in this.sensors) {
-			var b = sensorLib.read(this.sensors[a].type, this.sensors[a].pin);
+			var b = sensordht.read(this.sensors[a].type, this.sensors[a].pin);
 			console.log(this.sensors[a].name + ": " +
 			b.temperature.toFixed(1) + "C, " +
 			b.humidity.toFixed(1) + "%");
 		}
 		setTimeout(function() {
-			sensor.read();
+			sensordht.read();
 		}, 2000);
 	}
+}
+
+var sensor = require('node-dht-sensor');
+
+function test() {
+sensor.read(11, 2, function(err, temperature, humidity) {
+    if (!err) {
+        console.log('temp: ' + temperature.toFixed(1) + '°C, ' +
+            'humidity: ' + humidity.toFixed(1) + '%');
+	} else {
+		console.log(err);
+	}
+    });
 }
