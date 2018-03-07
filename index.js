@@ -1,12 +1,19 @@
 //run setups
 var wpi = require('wiring-pi');
+var dhtsensor = require('node-dht-sensor');
 //var usonic = require('r-pi-usonic');
 wpi.setup('wpi');
+
 
 //pins
 var ledpin = 7;
 var trigpin = 11;
 var echopin = 12;
+var dhtpin = 0; //temp
+
+//voltage init
+var LOW = 0;
+var HIGH = 1;
 
 //set mode
 wpi.pinMode(ledpin, wpi.OUTPUT);
@@ -35,6 +42,8 @@ setInterval(function() {
 
 	var usonicDistance = readUsonicSensor();
 	console.log(usonicDistance);
+
+	sensordht.read();
 }, 500);
 
 function readPin(inputPin) {
@@ -50,3 +59,21 @@ function initUsonicSensor() {
 	setTimeout(function() { console.log(sensor().toFixed(2)) }, 60);
 };
 	
+var sensordht = {
+	sensors: [{
+		name: "dht",
+		type: 11,
+		pin: 8
+	}],
+	read: function() {
+		for (var a in this.sensors) {
+			var b = sensorLib.read(this.sensors[a].type, this.sensors[a].pin);
+			console.log(this.sensors[a].name + ": " +
+			b.temperature.toFixed(1) + "C, " +
+			b.humidity.toFixed(1) + "%");
+		}
+		setTimeout(function() {
+			sensor.read();
+		}, 2000);
+	}
+}
