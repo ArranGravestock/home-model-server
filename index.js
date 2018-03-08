@@ -8,18 +8,28 @@ wpi.setup('wpi');
 //pins
 var ledpin = 7;
 var trigpin = 11;
-var echopin = 12;
+var echopin = 32;
 var motion = 16	;
+var touch = 15;
 
 //voltage init
 var LOW = 0;
-var HIGH = 1;
+//var HIGH = 1;
 
 //set mode
 wpi.pinMode(ledpin, wpi.OUTPUT);
 wpi.pinMode(trigpin, wpi.OUTPUT);
 wpi.pinMode(echopin, wpi.INPUT);
 wpi.pinMode(motion, wpi.INPUT);
+wpi.pinMode(touch, wpi.INPUT);
+
+function readTouch() {
+	if (wpi.digitalRead(touch)) {
+		console.log("touch activated");
+	} else {
+		console.log(wpi.digitalRead(touch));
+	}
+}
 
 function readMotion() {
 	if (wpi.digitalRead(motion)) {
@@ -44,26 +54,27 @@ usonic.init(function (error) {
 });
 
 function readUsonicSensor() {
-	wpi.digitalWrite(trigpin, 0);
-	wpi.delay(50);
+	var pulse_start = 0;
+
 	wpi.digitalWrite(trigpin, 1);
-	wpi.delay(100);
+	wpi.delayMicroseconds(10);
 	wpi.digitalWrite(trigpin, 0);
 	
-	var pulse_start = wpi.pulseIn(echopin, 0);
-	var pulse_end = wpi.pulseIn(echopin, 1);
-	var pulse_duration = pulse_end - pulse_start;
-	var distance = pulse_duration * 17150;
-	return distance;
+	pulse_start = wpi.pulseIn(echopin, 1);
+	//var pulse_end = wpi.pulseIn(echopin, 1);
+	//var pulse_duration = pulse_end - pulse_start;
+	//var distance = pulse_duration * 17150;
+	console.log(pulse_start);
 }
 
 var value = 0;
 setInterval(function() {
 	wpi.digitalWrite(ledpin, value);
 	value = +!value;
-
-	readMotion();	
-}, 500);
+	readUsonicSensor();	
+//	readTouch();
+//	readMotion();	
+}, 100);
 
 function readPin(inputPin) {
 	var state = wpi.digitalRead(inputPin);
