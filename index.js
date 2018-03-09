@@ -1,16 +1,15 @@
 //run setups
 var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
-var usonic = require('r-pi-usonic');
 wpi.setup('wpi');
 
 
 //pins
 var ledpin = 7;
-var trigpin = 11;
-var echopin = 32;
-var motion = 16	;
-var touch = 15;
+var trigpin = 29;
+var echopin = 28;
+var motion = 4;
+var touch = 3;
 
 //voltage init
 var LOW = 0;
@@ -24,57 +23,53 @@ wpi.pinMode(motion, wpi.INPUT);
 wpi.pinMode(touch, wpi.INPUT);
 
 function readTouch() {
-	if (wpi.digitalRead(touch)) {
+	var touch_state = wpi.digitalRead(touch);
+	if (touch_state) {
 		console.log("touch activated");
 	} else {
-		console.log(wpi.digitalRead(touch));
+		console.log("no touch");
 	}
 }
 
 function readMotion() {
-	if (wpi.digitalRead(motion)) {
-		console.log(wpi.digitalRead(motion));	
+	var motion_state = wpi.digitalRead(motion);
+	
+	if (motion_state) {	
 		console.log("motion detected");
 	} else {
 		console.log("no motion");
 	}
-	wpi.delay(5000);
+	wpi.delay(500);
 }
 
-usonic.init(function (error) {
-	if (error) {
-		console.log(error);
-	} else {
-		var sensor = usonic.createSensor(echopin, trigpin, 450);
-		setInterval(function() {
-			var distance = sensor();
-//			console.log(distance);
-		}, 500);
-	}
-});
-
 function readUsonicSensor() {
-	var pulse_start = 0;
-
+	//var pulse_start = wpi.micros();
+//	var pulse_start = wpi.pulseIn(echopin, 1);
+	wpi.digitalWrite(trigpin, 0);
+	wpi.delayMicroseconds(5);
 	wpi.digitalWrite(trigpin, 1);
 	wpi.delayMicroseconds(10);
 	wpi.digitalWrite(trigpin, 0);
 	
-	pulse_start = wpi.pulseIn(echopin, 1);
+	var pulse_start = wpi.pulseIn(echopin, 1);
 	//var pulse_end = wpi.pulseIn(echopin, 1);
 	//var pulse_duration = pulse_end - pulse_start;
 	//var distance = pulse_duration * 17150;
-	console.log(pulse_start);
+//	console.log(pulse_start);
+	var distance_cm = pulse_start / 2 / 29.1;
+	console.log(distance_cm.toFixed(2)+ "cm");
 }
 
 var value = 0;
 setInterval(function() {
 	wpi.digitalWrite(ledpin, value);
 	value = +!value;
+
 	readUsonicSensor();	
-//	readTouch();
-//	readMotion();	
-}, 100);
+	readTouch();
+	test();
+	readMotion();	
+}, 300);
 
 function readPin(inputPin) {
 	var state = wpi.digitalRead(inputPin);
@@ -82,12 +77,6 @@ function readPin(inputPin) {
 	var json = JSON.stringify(stringBuilder);
 	console.log(json);
 }
-
-function initUsonicSensor() {
-	var sensor = usonic.createSensor(echopin, trigpin, 450);
-	
-//	setTimeout(function() { console.log(sensor().toFixed(2)) }, 60);
-};
 	
 var sensordht = {
 	sensors: [{
