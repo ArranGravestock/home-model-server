@@ -10,6 +10,10 @@ var trigpin = 29;
 var echopin = 28;
 var motion = 4;
 var touch = 3;
+var gas = 9;
+var r = 23;
+var g = 24;
+var b = 26;
 
 var spiclk = 14;
 var spimiso = 12;
@@ -31,6 +35,7 @@ wpi.pinMode(trigpin, wpi.OUTPUT);
 wpi.pinMode(echopin, wpi.INPUT);
 wpi.pinMode(motion, wpi.INPUT);
 wpi.pinMode(touch, wpi.INPUT);
+wpi.pinMode(gas, wpi.INPUT);
 
 wpi.pinMode(motor_one, wpi.OUTPUT);
 wpi.pinMode(motor_two, wpi.OUTPUT);
@@ -41,6 +46,21 @@ wpi.pinMode(spimosi, wpi.OUTPUT);
 wpi.pinMode(spimiso, wpi.INPUT);
 wpi.pinMode(spiclk, wpi.OUTPUT);
 wpi.pinMode(spics, wpi.OUTPUT);
+
+wpi.pinMode(r, wpi.PWM_OUTPUT);
+wpi.pinMode(g, wpi.PWM_OUTPUT);
+wpi.pinMode(b, wpi.PWM_OUTPUT);
+
+function setRGB(red, green, blue) {
+	console.log("red:"  +  red + " green: " + green + " blue " + blue);
+	wpi.pwmWrite(r, red);
+	wpi.pwmWrite(g, green);
+	wpi.pwmWrite(b, blue);
+}
+
+function readGas() {
+	console.log(wpi.digitalRead(gas));
+}
 
 function readTouch() {
 	var touch_state = wpi.digitalRead(touch);
@@ -78,7 +98,7 @@ var value = 0;
 setInterval(function() {
 	wpi.digitalWrite(ledpin, value);
 	value = +!value;
-
+//	readGas();
 //	readUsonicSensor();	
 //	readTouch();
 //	test();
@@ -159,5 +179,11 @@ function startMotor(data) {
 		wpi.delayMicroseconds(1);
 		setStep(1,0,0,1);
 		wpi.delayMicroseconds(1);
+	}
+	console.log(data.length);
+	if (data.length == 12) {
+		console.log(data.toString().substr(0,3));
+		console.log("data is + " + data);
+		setRGB(data.toString().substr(0,3), data.toString().substr(4,3), data.toString().substr(8,3));
 	}
 }
