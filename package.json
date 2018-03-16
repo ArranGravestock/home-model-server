@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/ArranGravestock/home-model-server#readme",
   "dependencies": {
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
     "r-pi-usonic": "^2.5.0",
+    "tedious": "^2.3.1",
     "wiring-pi": "^2.2.1"
   }
 }
