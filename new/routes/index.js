@@ -3,24 +3,20 @@
 var express = require('express');
 var router = express.Router();
 
-var Connection = require('tedious').Connection;
-var Request = require('tedious').Request;
-var TYPES = require('tedious').TYPES;
-
 var dataController = require('../api/controllers/DataController');
 
-dataController.Connect;
+//dataController.Connect;
 
 router.get('/testhash', function(req, res) {
     res.send(dataController.checkLogin(req, res, 'test', 'testpass'));
 })
 
-router.get('/login/:username/:password', function(req, res) {
+router.get('/login', function(req, res) {
 
 })
 
-router.post('/signup/:username/:password/:email', function(req, res) {
-    res.send(dataController.newUser(req, res, req.params.username, req.params.password, req.params.email));
+router.post('/signup', function(req, res) {
+   dataController.newUser(req, res);
 })
 
 router.get('/devices', function(req, res) {
