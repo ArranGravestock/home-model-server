@@ -1,31 +1,52 @@
 'Use Strict';
 
 var express = require('express');
-var app = express();
-let http = require('http');
+var router = express.Router();
 
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
 
-var config = {
-    userName: 'sa', //use new account with permission rather than sa
-    password: 'testpassword123',
-    server: 'localhost',
-    options: {
-        database: 'home-model'
-    }
-}
+var dataController = require('../api/controllers/DataController');
 
-var connection = new Connection(config);
+dataController.Connect;
 
-connection.on('connect', function(err) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Connected');
-    }
-});
+router.get('/testhash', function(req, res) {
+    res.send(dataController.checkLogin(req, res, 'test', 'testpass'));
+})
+
+router.get('/login/:username/:password', function(req, res) {
+
+})
+
+router.post('/signup/:username/:password/:email', function(req, res) {
+    res.send(dataController.newUser(req, res, req.params.username, req.params.password, req.params.email));
+})
+
+router.get('/devices', function(req, res) {
+    res.send(dataController.DeviceNames());
+})
+
+router.get('/:device/rooms', function(req, res) {
+    res.send(dataController.DeviceRooms(res, res, req.params.device));
+})
+
+router.get('/:device/:room/lights', function(req, res) {
+    res.send(dataController.RoomLights(req, res, req.params.device, req.params.room));
+})
+
+router.get('/:device/:room/sensors', function(req, res) {
+    res.send(dataController.RoomSensors(req, res, req.params.device, req.params.room));
+})
+
+router.get('/:device/:room/sensors/:sensor', function(req, res) {
+    res.send(dataController.Sensor(req, res, req.params.device, req.params.room, req.params.sensor));
+})
+
+router.get('/:device/:room/lights/:light', function(req, res) {
+    res.send(dataController.Light(req, res, req.params.device, req.params.room, req.params.light));
+})
+
 
 /*
 var fs = require("fs");``
@@ -47,7 +68,7 @@ app.get('/:device/:roomid', function(req, res) {
     })
 })
 */
-
+/*
 app.put('/:device/reading', function(req, res) {
     request = new Request(`INSERT INTO Rooms (DeviceID, RoomName)
     VALUES ('${req.params.device}', 'bedroom')`,
@@ -63,32 +84,7 @@ app.put('/:device/reading', function(req, res) {
     connection.execSql(request); 
 })
 
-app.get('/devices', function(req, res) {
-    request = new Request(`SELECT Devices.DeviceName FROM Devices`, 
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-            //if sending int use .toString() e.g. res.send(rowCount.toString());
-        }
-    })
 
-    var test = [];
-    request.on('row', function(columns) {
-        columns.forEach(column => {
-            test.push(column.value);
-        });
-    })
-    
-    request.on('done', function() {
-        
-    })
-    
-
-    connection.execSql(request); 
-    res.send(test);
-})
 
 app.get('/:device/rooms', function(req, res) {
     request = new Request(`SELECT Rooms.RoomName
@@ -139,7 +135,7 @@ app.get('/:device/:room/sensors', function(req, res) {
     connection.execSql(request);  
 })
 
-app.get('/:device/:room/sensors/:sensor', function(req, res) {
+app.get('/:device/rooms/:room/sensors/:sensor', function(req, res) {
     request = new Request(
     `SELECT Sensors.SensorID, Sensors.SensorName, Sensors.SensorState
     FROM Devices
@@ -173,7 +169,14 @@ app.get('/:device/:room/lights/:light', function(req, res) {
     connection.execSql(request);  
 })
 
-var server = app.listen(8080, function() {
-    var host = server.address().address;
-    var port = server.address().port;
-})
+//var server = app.listen(8080, function() {
+  //  var host = server.address().address;
+   // var port = server.address().port;
+//})
+
+/* GET home page. */
+//router.get('/', function(req, res, next) {
+  //res.render('index', { title: 'Express' });
+//});
+
+module.exports = router;

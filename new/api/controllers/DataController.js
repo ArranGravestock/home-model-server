@@ -1,12 +1,9 @@
 'Use Strict';
-
-var express = require('express');
-var app = express();
-let http = require('http');
-
-var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
+var Connection = require('tedious').Connection;
 var TYPES = require('tedious').TYPES;
+
+var crypto = require('crypto');
 
 var config = {
     userName: 'sa', //use new account with permission rather than sa
@@ -19,58 +16,71 @@ var config = {
 
 var connection = new Connection(config);
 
-connection.on('connect', function(err) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Connected');
-    }
-});
+exports.Connect = function() {
+    connection.on('connect', function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Connected');
+        }
+    });
+}
 
-/*
-var fs = require("fs");``
-app.get('/test', function(req, res) {
-    fs.readFile(__dirname + "/" + "server_test.json", 'utf8', function(err, data) {
-        var test = JSON.parse(data);
-        console.log(test);
-        res.end(data);
+var hashPass = function(password) {
+    crypto.pbkdf2('secret', 'salt', 100000, 512, 'sha512', (err, derviedKey) => {
+        if (err) throw err;
+        var hashedpass = derviedKey.toString('hex');
+        console.log(hashedpass);
+        return hashedpass;
     })
-})
+}
 
-app.get('/:device/:roomid', function(req, res) {
-    fs.readFile(__dirname + "/" + "server_test.json", 'utf8', function(err, data) {
-        var device = JSON.parse(data);
-        var rooms = device[req.params.device]
-        var room_items = rooms[req.params.roomid]
-        console.log(room_items);
-        res.end(JSON.stringify(room_items));
+exports.newUser = function(req, res, username, password, email) {
+    var hashedpass = hashPass(password);
+    console.log("new user(s) creating...");
+    request = new Request(`INSERT INTO Users (UserName, Password, Email)
+    VALUES ('${username}', '${hashedpass}', '${email}')`,
+    function(err) {
+        if (err) {
+            return err;
+        } else {
+            return true;
+        }
     })
-})
-*/
+    connection.execSql(request);
+}
 
-app.put('/:device/reading', function(req, res) {
-    request = new Request(`INSERT INTO Rooms (DeviceID, RoomName)
-    VALUES ('${req.params.device}', 'bedroom')`,
-        function(err, rowCount) {
-            if (err) {
-                console.log(err);
+exports.checkLogin = function(req, res, username, password) {
+    var hashedpass = hashPass(password);
+
+    request = new Request(`SELECT Users.UserName FROM Users
+    WHERE Users.UserName = ${username} AND Users.Password = ${hashedpass}`,
+    function(err, rowCount) {
+        if(err) {
+            console.log(err);
+            return err;
+        } else {
+            console.log(`${rowCount} row(s) returned`);
+            if (rowCount) {
+                return true;
             } else {
-                res.send(`${rowCount} (s) inserted`)
-                console.log(`${rowCount} (s) inserted`);
+                return false;
             }
         }
-    )
-    connection.execSql(request); 
-})
+    })
+    connection.execSql(request);
+}
 
-app.get('/devices', function(req, res) {
+exports.DeviceNames = function(req, res) {
     request = new Request(`SELECT Devices.DeviceName FROM Devices`, 
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return err;
         } else {
             console.log(`${rowCount} row(s) returned`);
             //if sending int use .toString() e.g. res.send(rowCount.toString());
+            return rowCount;
         }
     })
 
@@ -79,101 +89,106 @@ app.get('/devices', function(req, res) {
         columns.forEach(column => {
             test.push(column.value);
         });
-    })
-    
-    request.on('done', function() {
-        
-    })
-    
+    })   
 
-    connection.execSql(request); 
-    res.send(test);
-})
+    connection.execSql(request);
+    
+}
 
-app.get('/:device/rooms', function(req, res) {
+exports.DeviceRooms = function(req, res, device) {
     request = new Request(`SELECT Rooms.RoomName
     FROM Rooms
     RIGHT JOIN Devices on Devices.DeviceID = Rooms.DeviceID
-    WHERE Devices.DeviceName = '${req.params.device}'`, 
+    WHERE Devices.DeviceName = '${device}'`, 
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return err;
         } else {
             console.log(`${rowCount} row(s) returned`);
+            return rowCount;
         }
     })
-    connection.execSql(request);  
-})
 
-app.get('/:device/:room/lights', function(req, res) {
+    connection.execSql(request);  
+}
+
+exports.RoomLights = function(req, res, device, room) {
     request = new Request(
     `SELECT Rooms.RoomName, Lights.LightName, Lights.LightState
     FROM Devices
     RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
     RIGHT JOIN Lights on Rooms.RoomID = Lights.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}'`,
+    WHERE Devices.DeviceName = '${device}' AND Rooms.RoomName = '${room}'`,
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return(err);
         } else {
             console.log(`${rowCount} row(s) returned`);
+            return(rowCount);
         }
     })
-    connection.execSql(request);   
-})
 
-app.get('/:device/:room/sensors', function(req, res) {
+    connection.execSql(request);
+}
+
+exports.RoomSensors = function(req, res, device, room) {
     request = new Request(
     `SELECT Rooms.RoomName, Sensors.SensorName, Sensors.SensorState
     FROM Devices
     RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
     RIGHT JOIN Sensors on Rooms.RoomID = Sensors.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}'`, 
+    WHERE Devices.DeviceName = '${device}' AND Rooms.RoomName = '${room}'`, 
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return(err);
         } else {
             console.log(`${rowCount} row(s) returned`);
+            return(rowCount);
         }
     })
-    connection.execSql(request);  
-})
 
-app.get('/:device/:room/sensors/:sensor', function(req, res) {
+    connection.execSql(request);
+}
+
+exports.Sensor = function(req, res, device, room, sensor) {
     request = new Request(
     `SELECT Sensors.SensorID, Sensors.SensorName, Sensors.SensorState
     FROM Devices
     RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
     RIGHT JOIN Sensors on Rooms.RoomID = Sensors.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}' AND Sensors.SensorName = '${req.params.sensor}'`, 
+    WHERE Devices.DeviceName = '${device}' AND Rooms.RoomName = '${room}' AND Sensors.SensorName = '${sensor}'`, 
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return(err);
         } else {
             console.log(`${rowCount} row(s) returned`);
+            return(rowCount);
         }
     })
-    connection.execSql(request);  
-})
 
-app.get('/:device/:room/lights/:light', function(req, res) {
+    connection.execSql(request);
+}
+
+exports.Light = function(req, res, device, room, light) {
     request = new Request(
     `SELECT Lights.LightID, Lights.LightName, Lights.LightState
     FROM Devices
     RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
     RIGHT JOIN Lights on Rooms.RoomID = Lights.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}' AND Lights.LightName = '${req.params.light}'`, 
+    WHERE Devices.DeviceName = '${device}' AND Rooms.RoomName = '${room}' AND Lights.LightName = '${light}'`, 
     function(err, rowCount) {
         if (err) {
             console.log(err);
+            return(err);
         } else {
             console.log(`${rowCount} row(s) returned`);
+            return(rowCount);
         }
     })
-    connection.execSql(request);  
-})
 
-var server = app.listen(8080, function() {
-    var host = server.address().address;
-    var port = server.address().port;
-})
+    connection.execSql(request);  
+}

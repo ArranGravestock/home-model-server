@@ -8,6 +8,6 @@ function test() {
         }
     }
 
-    xhttp.open("GET", "/server_test.json", true);
+    xhttp.open("GET", "localhost/rest.js/", true);
     xhttp.send();
 }
