@@ -27,16 +27,14 @@ var crypto = require('crypto');
 
 exports.newUser = function(req, res) {
     console.log("new user(s) initiated...");   
-    console.log("test " + userModel.createUser(req.query));
-    //return userModel.createUser(req.query)
-    // if(userModel.createUser(req.query)) {
-    //     console.log("test")
-    //     res.statusCode = 200;
-    //     res.send('Success');
-    // } else {
-    //     res.statusCode = 500;
-    //     res.send('Error processing request');
-    // }
+    //console.log("test " + userModel.createUser(req.query));]
+    if (userModel.createUser(req.query)) {
+        res.status(400);
+        res.send("failure");
+    } else {
+        res.status(201);
+        res.send("success");
+    }
 }
 
 exports.checkLogin = function(req, res, username, password) {

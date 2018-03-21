@@ -44,29 +44,41 @@ hashPass = (password) => {
 let hashedPass = "";
 module.exports = {
     createUser: (data) => {
-        //hashedPass = hashPass("test"); causes error undefined ???
+        hashedPass = hashPass("test"); //causes error undefined ???
+        console.log(hashedPass); //undefined??????
         //console.log(hashedPass);
 
+        // request = new Request(`INSERT INTO Users (UserName, Password, Email)
+        // VALUES ('${data.username}', '${data.password}', '${data.email}')`,
+        // function(err) {
+        //     if (err) {
+        //         console.log(err)
+        //         return false;
+        //     } else {
+        //         //result = true;
+        //         //console.log(result);
+        //         console.log("here");
+        //         return true;
+        //     }
+        // })
+        // console.log(request);
+
+        // request.on('requestCompleted', function() {
+        //     console.log("request done");
+        //     return true;
+        // })
         request = new Request(`INSERT INTO Users (UserName, Password, Email)
         VALUES ('${data.username}', '${data.password}', '${data.email}')`,
         function(err) {
             if (err) {
                 console.log(err)
-                return false;
+                return err.message;
             } else {
-                //result = true;
-                //console.log(result);
-                console.log("here");
                 return true;
             }
         })
-        console.log(request);
-
-        request.on('requestCompleted', function() {
-            console.log("request done");
-            return true;
-        })
-
         connection.execSql(request);
+
+        
     }
 }
