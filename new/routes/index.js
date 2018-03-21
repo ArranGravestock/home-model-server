@@ -18,7 +18,7 @@ router.get('/login', function(req, res) {
 router.post('/signup', function(req, res) {
    dataController.newUser(req, res);
 })
-
+/*
 router.get('/devices', function(req, res) {
     res.send(dataController.DeviceNames());
 })
@@ -42,7 +42,7 @@ router.get('/:device/:room/sensors/:sensor', function(req, res) {
 router.get('/:device/:room/lights/:light', function(req, res) {
     res.send(dataController.Light(req, res, req.params.device, req.params.room, req.params.light));
 })
-
+*/
 
 /*
 var fs = require("fs");``

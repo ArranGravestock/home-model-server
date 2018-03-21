@@ -1,44 +1,42 @@
 'Use Strict';
-var Request = require('tedious').Request;
-var Connection = require('tedious').Connection;
-var TYPES = require('tedious').TYPES;
+
 let userModel = require('../models/users');
 
 var crypto = require('crypto');
 
-exports.Connect = function() {
-    var config = {
-        userName: 'sa', //use new account with permission rather than sa
-        password: 'testpassword123',
-        server: 'localhost',
-        options: {
-            database: 'home-model'
-        }
-    }
+// exports.Connect = function() {
+//     var config = {
+//         userName: 'sa', //use new account with permission rather than sa
+//         password: 'testpassword123',
+//         server: 'localhost',
+//         options: {
+//             database: 'home-model'
+//         }
+//     }
 
-    var connection = new Connection(config);
+//     var connection = new Connection(config);
 
-    connection.on('connect', function(err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Connected');
-        }
-    });
-}
+//     connection.on('connect', function(err) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             console.log('Connected');
+//         }
+//     });
+// }
 
 exports.newUser = function(req, res) {
     console.log("new user(s) initiated...");   
-    console.log(userModel.createUser(req.query));
-    
-    if(userModel.createUser(req.query)) {
-        console.log("test")
-        res.statusCode = 200;
-        res.send('Success');
-    } else {
-        res.statusCode = 500;
-        res.send('Error processing request');
-    }
+    console.log("test " + userModel.createUser(req.query));
+    //return userModel.createUser(req.query)
+    // if(userModel.createUser(req.query)) {
+    //     console.log("test")
+    //     res.statusCode = 200;
+    //     res.send('Success');
+    // } else {
+    //     res.statusCode = 500;
+    //     res.send('Error processing request');
+    // }
 }
 
 exports.checkLogin = function(req, res, username, password) {
