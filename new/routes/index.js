@@ -15,13 +15,7 @@ router.post('/signup', function(req, res) {
 })
 
 //retrieve
-router.get('/test', function(req, res) {
-    console.log("test2");
-    res.status(200);
-    res.send('test');
-})
-
-router.get('/login', function(req, res) {
+router.post('/login', function(req, res) {
     dataController.validateLogin(req, res);
 })
 
