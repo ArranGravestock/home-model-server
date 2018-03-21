@@ -4,8 +4,9 @@ var Request = require('tedious').Request;
 var Connection = require('tedious').Connection;
 
 var crypto = require('crypto');
+var database = require('./database');
 
-//var database = require('./database');
+var connection = database.Connect();
 
 let user = {
     "username": "",
@@ -13,26 +14,8 @@ let user = {
     "email": ""
 }
 
-var config = {
-    userName: 'sa', //use new account with permission rather than sa
-    password: 'testpassword123',
-    server: 'localhost',
-    options: {
-        database: 'home-model'
-    }
-}
-
-var connection = new Connection(config);
-
-connection.on('connect', function(err) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Connected');
-    }
-});
-
 hashPass = (password) => {
+    crypto.createHmac('sha256', 'sdsadsa').update
     crypto.pbkdf2('secret', 'salt', 100000, 512, 'sha512', (err, derviedKey) => {
         if (err) throw err;
        
@@ -40,45 +23,43 @@ hashPass = (password) => {
         //console.log(hashedpass);
         return hashedpass;
     })
+   
 }
-let hashedPass = "";
+
 module.exports = {
-    createUser: (data) => {
-        hashedPass = hashPass("test"); //causes error undefined ???
-        console.log(hashedPass); //undefined??????
-        //console.log(hashedPass);
+    //hashedPass = hashPass("test"); //causes error undefined ???
+        //console.log(hashedPass); //undefined??????
+    createUser: (data, callback) => {
+        if(data.username && data.password && data.email) {
+            request = new Request(`INSERT INTO Users (UserName, Password, Email)
+            VALUES ('${data.username}', '${data.password}', '${data.email}')`,
+            function(err) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(true);
+                }
+            })
+            connection.execSql(request);
+        } else {
+            callback(false);
+        }
+    },
 
-        // request = new Request(`INSERT INTO Users (UserName, Password, Email)
-        // VALUES ('${data.username}', '${data.password}', '${data.email}')`,
-        // function(err) {
-        //     if (err) {
-        //         console.log(err)
-        //         return false;
-        //     } else {
-        //         //result = true;
-        //         //console.log(result);
-        //         console.log("here");
-        //         return true;
-        //     }
-        // })
-        // console.log(request);
-
-        // request.on('requestCompleted', function() {
-        //     console.log("request done");
-        //     return true;
-        // })
-        request = new Request(`INSERT INTO Users (UserName, Password, Email)
-        VALUES ('${data.username}', '${data.password}', '${data.email}')`,
-        function(err) {
+    validateLogin: (data, callback) => {      
+        request = new Request(`SELECT Users.UserName FROM Users
+        WHERE Users.UserName = '${data.username}' AND Users.Password = '${data.password}'`,
+        function(err, rowCount) {
             if (err) {
-                console.log(err)
-                return err.message;
+                callback(err);
             } else {
-                return true;
+                if (rowCount >= 1) {
+                    callback(true);
+                } else {
+                    callback(false);
+               }
             }
         })
         connection.execSql(request);
-
-        
     }
 }

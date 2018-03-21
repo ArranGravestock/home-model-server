@@ -5,44 +5,52 @@ var router = express.Router();
 
 var dataController = require('../api/controllers/DataController');
 
-//dataController.Connect;
+var database = require('../api/models/database');
 
-router.get('/testhash', function(req, res) {
-    res.send(dataController.checkLogin(req, res, 'test', 'testpass'));
+database.initConnect;
+
+//create
+router.post('/signup', function(req, res) {
+    dataController.newUser(req, res);
 })
+
+//retrieve
+router.get('/test'), function(req, res) {
+    console.log("test2");
+}
 
 router.get('/login', function(req, res) {
-
+    dataController.validateLogin(req, res);
 })
 
-router.post('/signup', function(req, res) {
-   dataController.newUser(req, res);
-})
-/*
 router.get('/devices', function(req, res) {
-    res.send(dataController.DeviceNames());
+   dataController.DeviceNames(req, res);
 })
 
-router.get('/:device/rooms', function(req, res) {
-    res.send(dataController.DeviceRooms(res, res, req.params.device));
+router.get('/device/:deviceid/rooms', function(req, res) {
+    dataController.DeviceRooms(req, res);
 })
 
-router.get('/:device/:room/lights', function(req, res) {
-    res.send(dataController.RoomLights(req, res, req.params.device, req.params.room));
+router.get('/device/:deviceid/room/:roomid/lights', function(req, res) {
+    dataController.RoomLights(req, res);
 })
 
-router.get('/:device/:room/sensors', function(req, res) {
-    res.send(dataController.RoomSensors(req, res, req.params.device, req.params.room));
+router.get('/device/:deviceid/room/:roomid/sensors', function(req, res) {
+    dataController.RoomSensors(req, res);
 })
 
-router.get('/:device/:room/sensors/:sensor', function(req, res) {
-    res.send(dataController.Sensor(req, res, req.params.device, req.params.room, req.params.sensor));
+router.get('/device/:deviceid/room/:roomid/sensor/:sensorid', function(req, res) {
+    console.log("device lightsate reached");
+    dataController.SensorState(req, res);
 })
 
-router.get('/:device/:room/lights/:light', function(req, res) {
-    res.send(dataController.Light(req, res, req.params.device, req.params.room, req.params.light));
+
+
+router.get('device123/:deviceid/room/:roomid/light/:lightid', function(req, res) {
+    console.log("device lightsate reached");
+    //dataController.LightState(req, res);
 })
-*/
+
 
 /*
 var fs = require("fs");``
@@ -64,115 +72,5 @@ app.get('/:device/:roomid', function(req, res) {
     })
 })
 */
-/*
-app.put('/:device/reading', function(req, res) {
-    request = new Request(`INSERT INTO Rooms (DeviceID, RoomName)
-    VALUES ('${req.params.device}', 'bedroom')`,
-        function(err, rowCount) {
-            if (err) {
-                console.log(err);
-            } else {
-                res.send(`${rowCount} (s) inserted`)
-                console.log(`${rowCount} (s) inserted`);
-            }
-        }
-    )
-    connection.execSql(request); 
-})
-
-
-
-app.get('/:device/rooms', function(req, res) {
-    request = new Request(`SELECT Rooms.RoomName
-    FROM Rooms
-    RIGHT JOIN Devices on Devices.DeviceID = Rooms.DeviceID
-    WHERE Devices.DeviceName = '${req.params.device}'`, 
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-        }
-    })
-    connection.execSql(request);  
-})
-
-app.get('/:device/:room/lights', function(req, res) {
-    request = new Request(
-    `SELECT Rooms.RoomName, Lights.LightName, Lights.LightState
-    FROM Devices
-    RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
-    RIGHT JOIN Lights on Rooms.RoomID = Lights.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}'`,
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-        }
-    })
-    connection.execSql(request);   
-})
-
-app.get('/:device/:room/sensors', function(req, res) {
-    request = new Request(
-    `SELECT Rooms.RoomName, Sensors.SensorName, Sensors.SensorState
-    FROM Devices
-    RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
-    RIGHT JOIN Sensors on Rooms.RoomID = Sensors.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}'`, 
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-        }
-    })
-    connection.execSql(request);  
-})
-
-app.get('/:device/rooms/:room/sensors/:sensor', function(req, res) {
-    request = new Request(
-    `SELECT Sensors.SensorID, Sensors.SensorName, Sensors.SensorState
-    FROM Devices
-    RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
-    RIGHT JOIN Sensors on Rooms.RoomID = Sensors.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}' AND Sensors.SensorName = '${req.params.sensor}'`, 
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-        }
-    })
-    connection.execSql(request);  
-})
-
-app.get('/:device/:room/lights/:light', function(req, res) {
-    request = new Request(
-    `SELECT Lights.LightID, Lights.LightName, Lights.LightState
-    FROM Devices
-    RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
-    RIGHT JOIN Lights on Rooms.RoomID = Lights.RoomID
-    WHERE Devices.DeviceName = '${req.params.device}' AND Rooms.RoomName = '${req.params.room}' AND Lights.LightName = '${req.params.light}'`, 
-    function(err, rowCount) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`${rowCount} row(s) returned`);
-        }
-    })
-    connection.execSql(request);  
-})
-
-//var server = app.listen(8080, function() {
-  //  var host = server.address().address;
-   // var port = server.address().port;
-//})
-
-/* GET home page. */
-//router.get('/', function(req, res, next) {
-  //res.render('index', { title: 'Express' });
-//});
 
 module.exports = router;
