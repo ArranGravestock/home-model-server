@@ -15,9 +15,11 @@ router.post('/signup', function(req, res) {
 })
 
 //retrieve
-router.get('/test'), function(req, res) {
+router.get('/test', function(req, res) {
     console.log("test2");
-}
+    res.status(200);
+    res.send('test');
+})
 
 router.get('/login', function(req, res) {
     dataController.validateLogin(req, res);
@@ -40,15 +42,11 @@ router.get('/device/:deviceid/room/:roomid/sensors', function(req, res) {
 })
 
 router.get('/device/:deviceid/room/:roomid/sensor/:sensorid', function(req, res) {
-    console.log("device lightsate reached");
     dataController.SensorState(req, res);
 })
 
-
-
-router.get('device123/:deviceid/room/:roomid/light/:lightid', function(req, res) {
-    console.log("device lightsate reached");
-    //dataController.LightState(req, res);
+router.get('/device/:deviceid/room/:roomid/light/:lightid', function(req, res) {
+    dataController.LightState(req, res);
 })
 
 
