@@ -11,11 +11,11 @@ router.post('/signup', function(req, res) {
     dataController.newUser(req, res);
 })
 
-//retrieve
 router.post('/login', function(req, res) {
     dataController.validateLogin(req, res);
 })
 
+//retrieve
 router.get('/devices', function(req, res) {
    dataController.DeviceNames(req, res);
 })

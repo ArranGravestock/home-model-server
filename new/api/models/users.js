@@ -14,35 +14,39 @@ let user = {
 module.exports = {
     //hashedPass = hashPass("test"); //causes error undefined ???
         //console.log(hashedPass); //undefined??????
-    createUser: (data, callback) => {
-        if(data.username && data.password && data.email) {
-            connection.query(`INSERT INTO Users (UserName, Password, Email)
-            VALUES ('${data.username}', '${data.password}', '${data.email}')`,
-            function(err) {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(true);
-                }
-            })
-        } else {
-            callback(false);
-        }
+    createUser: (data) => {
+        return new Promise((resolve, reject) => {
+            if(data.username && data.password && data.email) {
+                connection.query(`INSERT INTO Users (UserName, Password, Email)
+                VALUES ('${data.username}', '${data.password}', '${data.email}')`,
+                function(err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                })
+            } else {
+                reject(false);
+            }
+        })
     },
 
-    validateLogin: (data, callback) => {
-        connection.query(`SELECT Users.UserName FROM Users
-        WHERE Users.UserName = '${data.username}' AND Users.Password = '${data.password}'`,
-        function(err, results) {
-            if (err) {
-                callback(err);
-            } else {
-                if (results >= 1) {
-                    callback(true);
+    validateLogin: (data) => {
+        return new Promise((resolve, reject) => {
+            connection.query(`SELECT Users.UserName FROM Users
+            WHERE Users.UserName = '${data.username}' AND Users.Password = '${data.password}'`,
+            function(err, results) {
+                if (err) {
+                    reject(err);
                 } else {
-                    callback(false);
-               }
-            }
+                    if (results >= 1) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                }
+            })
         })
     }
 }
