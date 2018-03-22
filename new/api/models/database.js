@@ -8,7 +8,6 @@ var connection = mysql.createConnection({
 })
 
 exports.initConnection = function() {
-    console.log("test");
     connection.connect(function(err) {
         if (err) {
             console.log(err);
