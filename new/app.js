@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 
+var database = require('./api/models/database');
+database.initConnection();
+
 var app = express();
 
 // uncomment after placing your favicon in /public

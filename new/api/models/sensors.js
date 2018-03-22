@@ -1,15 +1,12 @@
 'Use Strict';
 
-var Request = require('tedious').Request;
-var Connection = require('tedious').Connection;
-
 var database = require('./database');
 
 var connection = database.Connect();
 
 module.exports = {
     SensorState: (req, callback) => {
-        request = new Request(
+        connection.query(
         `SELECT Sensors.SensorID, Sensors.SensorName, Sensors.SensorState
         FROM Devices
         RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
@@ -24,6 +21,5 @@ module.exports = {
                 callback(rowCount);
             }
         })
-        connection.execSql(request);
     }
 }

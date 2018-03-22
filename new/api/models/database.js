@@ -1,25 +1,22 @@
-var Request = require('tedious').Request;
-var Connection = require('tedious').Connection;
+var mysql = require('mysql');
 
-var config = {
-    userName: 'sa', //use new account with permission rather than sa
-    password: 'testpassword123',
-    server: 'localhost',
-    options: {
-        database: 'home-model'
-    }
-}
+var connection = mysql.createConnection({
+    user: 'root', //use new account with permission rather than sa
+    password: '',
+    host: 'localhost',
+    database: 'home_model'
+})
 
-var connection = new Connection(config);
-
-exports.initConnect = function() {
-    connection.on('connect', function(err) {
+exports.initConnection = function() {
+    console.log("test");
+    connection.connect(function(err) {
         if (err) {
             console.log(err);
+            return err;
         } else {
-            console.log('Connected');
+            console.log("Connected to database...");
         }
-    });
+    })
 }
 
 exports.Connect = function() {

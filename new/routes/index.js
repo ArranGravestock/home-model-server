@@ -1,13 +1,10 @@
 'Use Strict';
-
+//sudo service mysql start
 var express = require('express');
 var router = express.Router();
 
 var dataController = require('../api/controllers/DataController');
-
 var database = require('../api/models/database');
-
-database.initConnect;
 
 //create
 router.post('/signup', function(req, res) {
