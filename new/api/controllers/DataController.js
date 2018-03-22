@@ -51,13 +51,12 @@ module.exports = {
     
     DeviceRooms: (req, res) => {
         deviceModel.getDeviceRooms(req.params).then(
-            () => {
-
+            function() {
                 res.status(204);
                 res.send("success");
             }
         ).catch(
-            () => {
+            function() {
                 res.status(400);
                 res.send("failure");
             }

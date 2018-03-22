@@ -18,11 +18,12 @@ module.exports = {
         return new Promise((resolve, reject) => {
             if(data.username && data.password && data.email) {
                 connection.query(`INSERT INTO Users (UserName, Password, Email)
-                VALUES ('${data.username}', '${data.password}', '${data.email}')`,
-                function(err) {
+                VALUES (?, ?, ?)`, [data.username, data.password, data.email],
+                function(err, results) {
                     if (err) {
                         reject(err);
                     } else {
+                        console.log(results);
                         resolve(true);
                     }
                 })
@@ -35,12 +36,12 @@ module.exports = {
     validateLogin: (data) => {
         return new Promise((resolve, reject) => {
             connection.query(`SELECT Users.UserName FROM Users
-            WHERE Users.UserName = '${data.username}' AND Users.Password = '${data.password}'`,
+            WHERE Users.UserName = ? AND Users.Password = ?`, [data.username, data.password],
             function(err, results) {
                 if (err) {
                     reject(err);
                 } else {
-                    if (results >= 1) {
+                    if (results.length) {
                         resolve(true);
                     } else {
                         resolve(false);

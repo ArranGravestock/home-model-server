@@ -14,12 +14,16 @@ module.exports = {
             FROM Devices
             RIGHT JOIN Rooms on Devices.DeviceID = Rooms.DeviceID
             RIGHT JOIN Lights on Rooms.RoomID = Lights.RoomID
-            WHERE Devices.DeviceID = '${req.deviceid}' AND Rooms.RoomID = '${req.roomid}' AND Lights.LightID = '${req.lightid}'`, 
-            function(err, data) {
+            WHERE Devices.DeviceID = ? AND Rooms.RoomID = ? AND Lights.LightID = ?`, [req.deviceid, req.roomid, req.lightid],
+            function(err, results) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(data);
+                    if(!results.length) {
+                        reject(false);
+                    } else {
+                        resolve(results);
+                    }
                 }
             })
         })

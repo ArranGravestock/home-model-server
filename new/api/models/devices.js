@@ -7,11 +7,15 @@ module.exports = {
     getDevices: () => {
         return new Promise((resolve, reject) => {
             connection.query(`SELECT Devices.DeviceName FROM Devices`, 
-            function(err, data) {
+            function(err, results) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(data);
+                    if (!results.length) {
+                        reject('Could not find any devices!');
+                    } else {
+                        resolve(results);
+                    }
                 }
             })
         });
@@ -22,15 +26,15 @@ module.exports = {
             connection.query(`SELECT Rooms.RoomName
             FROM Rooms
             RIGHT JOIN Devices on Devices.DeviceID = Rooms.DeviceID
-            WHERE Devices.DeviceID = '${req.deviceid}'`, 
-            function(err, data) {
+            WHERE Devices.DeviceID = ?`, [req.deviceid], 
+            function(err, results) {
                 if (err) {
                     reject(err)
                 } else {
-                    if(data.length == 0) {
-                        reject(data);
+                    if(!results.length) {
+                        reject(false);
                     } else {
-                        resolve(data);
+                        resolve(results);
                     }
                 }
             }) 
