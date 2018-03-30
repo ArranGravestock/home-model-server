@@ -3,7 +3,6 @@ var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
-
 //pins
 var ledpin = 7;
 var trigpin = 29;
@@ -24,10 +23,6 @@ var motor_one = 22;
 var motor_two = 23;
 var motor_three = 24;
 var motor_four = 25;
-
-//voltage init
-var LOW = 0;
-//var HIGH = 1;
 
 //set mode
 wpi.pinMode(ledpin, wpi.OUTPUT);
@@ -50,6 +45,27 @@ wpi.pinMode(spics, wpi.OUTPUT);
 wpi.pinMode(r, wpi.PWM_OUTPUT);
 wpi.pinMode(g, wpi.PWM_OUTPUT);
 wpi.pinMode(b, wpi.PWM_OUTPUT);
+
+//voltage initiation
+var LOW = 0;
+var HIGH = 1;
+
+class Pin {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		wpi.pinMode(pin, wpi.OUTPUT);
+	}
+
+	state() {
+		return this.state;
+	}
+
+	setState(state) {
+		this.state = state;
+		wpi.digitalWrite(this.pin, this.state);
+	}
+}
 
 function setRGB(red, green, blue) {
 	console.log("red:"  +  red + " green: " + green + " blue " + blue);
