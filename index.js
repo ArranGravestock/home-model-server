@@ -5,10 +5,6 @@ var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
 //pins
-var trigpin = 29;
-var echopin = 28;
-var motion = 4;
-var touch = 3;
 var gas = 9;
 var r = 23;
 var g = 24;
@@ -26,10 +22,6 @@ var motor_four = 25;
 
 //set mode
 
-wpi.pinMode(trigpin, wpi.OUTPUT);
-wpi.pinMode(echopin, wpi.INPUT);
-wpi.pinMode(motion, wpi.INPUT);
-wpi.pinMode(touch, wpi.INPUT);
 wpi.pinMode(gas, wpi.INPUT);
 
 wpi.pinMode(motor_one, wpi.OUTPUT);
@@ -133,41 +125,6 @@ class Motion {
 	}
 }
 
-
-
-
-
-// function setRGB(red, green, blue) {
-// 	console.log("red:"  +  red + " green: " + green + " blue " + blue);
-// 	wpi.pwmWrite(r, red);
-// 	wpi.pwmWrite(g, green);
-// 	wpi.pwmWrite(b, blue);
-// }
-
-// function readGas() {
-// 	console.log(wpi.digitalRead(gas));
-// }
-
-// function readTouch() {
-// 	var touch_state = wpi.digitalRead(touch);
-// 	if (touch_state) {
-// 		console.log("touch activated");
-// 	} else {
-// 		console.log("no touch");
-// 	}
-// }
-
-// function readMotion() {
-// 	var motion_state = wpi.digitalRead(motion);
-	
-// 	if (motion_state) {	
-// 		console.log("motion detected");
-// 	} else {
-// 		console.log("no motion");
-// 	}
-// 	wpi.delay(500);
-// }
-
 class Ultrasonic {
 	constructor(trigpin, echopin) {
 		this.trigpin = trigpin;
@@ -178,18 +135,18 @@ class Ultrasonic {
 		wpi.pinMode(echopin, wpi.INPUT);
 
 		setInterval(() => {
-			this.distance = readDistance();
+			this.distance = this.readDistance();
 		}, 2000)
 	}
 
 	readDistance() {
-		wpi.digitalWrite(trigpin, 0);
+		wpi.digitalWrite(this.trigpin, 0);
 		wpi.delayMicroseconds(5);
-		wpi.digitalWrite(trigpin, 1);
+		wpi.digitalWrite(this.trigpin, 1);
 		wpi.delayMicroseconds(10);
-		wpi.digitalWrite(trigpin, 0);
+		wpi.digitalWrite(this.trigpin, 0);
 
-		var pulse_start = wpi.pulseIn(echopin, 1);
+		var pulse_start = wpi.pulseIn(this.echopin, 1);
 		var distance_cm = pulse_start / 2 / 29.1;
 		return distance_cm.toFixed(2);
 	}
@@ -212,10 +169,10 @@ class Ultrasonic {
 // }
 
 
-var newPin = new Pin(ledpin);
+var newPin = new Pin(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
-var uson = new Ultrasonic(trigpin, echopin);
+var uson = new Ultrasonic(29, 28);
 
 
 
@@ -223,19 +180,18 @@ var value = 0;
 setInterval(function() {
 	newPin.setState(value);
 	value = +!value;
-
+	
+	console.log("----STARTED READING----");
 	console.log(touch.getState());
 	console.log(motion.getState());
 	console.log(uson.getDistance());
-
+	console.log("----FINISHED READING----");
 
 
 //	readGas();
-//	readUsonicSensor();	
-//	readTouch();
 //	test();
 //	readMotion();	
-}, 300);
+}, 1000);
 
 // function readPin(inputPin) {
 // 	var state = wpi.digitalRead(inputPin);
