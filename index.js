@@ -1,7 +1,7 @@
 "use strict";
 //run setups
 var wpi = require('wiring-pi');
-var dht = require('node-dht-sensor');
+var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
 //pins
@@ -173,13 +173,20 @@ class DHT {
 		return this.humidity;
 	}
 
+	setTemp(temp) {
+		this.temp = temp;
+	}
+
 	read() {
 		this.sensor.read(this.type, this.pin, function(err, temperature, humidity) {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
+				var result = [this.temp, this.humidity];
+				console.log(result);
+				//callback(result)
 			} else {
-				return err;
+				//callback(err);
 			}
 		})
 	}
@@ -189,10 +196,9 @@ var newPin = new Pin(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
-var dht = new DHT(2, sensor, 11)
-
-
+var dht = new DHT(2, dhtsensor, 11)
 var value = 0;
+
 setInterval(function() {
 	newPin.setState(value);
 	value = +!value;
@@ -201,26 +207,8 @@ setInterval(function() {
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
-	console.log(`TEMP: ${dht.readTemp()}`);
-	console.log(`HUMIDITY: ${dht.readHumidity()}`);
-	console.log("----FINISHED READING----");
+	dht.read();
+	//console.log(`TEMP: ${dht.readTemp()}`);
+	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
+	console.log("----FINISHED READING----\n");
 }, 1000);
-
-var sensordht = {
-	sensors: [{
-		name: "dht",
-		type: 11,
-		pin: 2
-	}],
-	read: function() {
-		for (var a in this.sensors) {
-			var b = sensordht.read(this.sensors[a].type, this.sensors[a].pin);
-			console.log(this.sensors[a].name + ": " +
-			b.temperature.toFixed(1) + "C, " +
-			b.humidity.toFixed(1) + "%");
-		}
-		setTimeout(function() {
-			sensordht.read();
-		}, 2000);
-	}
-}
