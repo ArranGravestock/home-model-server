@@ -1,7 +1,7 @@
 "use strict";
 //run setups
 var wpi = require('wiring-pi');
-var dhtsensor = require('node-dht-sensor');
+var dht = require('node-dht-sensor');
 wpi.setup('wpi');
 
 //pins
@@ -156,24 +156,40 @@ class Ultrasonic {
 	}
 }
 
-// function readUsonicSensor() {
-// 	wpi.digitalWrite(trigpin, 0);
-// 	wpi.delayMicroseconds(5);
-// 	wpi.digitalWrite(trigpin, 1);
-// 	wpi.delayMicroseconds(10);
-// 	wpi.digitalWrite(trigpin, 0);
-	
-// 	var pulse_start = wpi.pulseIn(echopin, 1);
-// 	var distance_cm = pulse_start / 2 / 29.1;
-// 	console.log(distance_cm.toFixed(2)+ "cm");
-// }
+class DHT {
+	constructor(pin, sensor, type) {
+		this.pin = pin;
+		this.type = type;
+		this.sensor = sensor;
+		this.temp = 0;
+		this.humidity = 0;
+	}
 
+	readTemp() {
+		return this.temp;
+	}
+
+	readHumidity() {
+		return this.humidity;
+	}
+
+	read() {
+		this.sensor.read(this.type, this.pin, function(err, temperature, humidity) {
+			if (!err) {
+				this.temp = temperature.toFixed(1);
+				this.humidity = humidity.toFixed(1);
+			} else {
+				return err;
+			}
+		})
+	}
+}
 
 var newPin = new Pin(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
-
+var dht = new DHT(2, sensor, 11)
 
 
 var value = 0;
@@ -182,24 +198,14 @@ setInterval(function() {
 	value = +!value;
 	
 	console.log("----STARTED READING----");
-	console.log(touch.getState());
-	console.log(motion.getState());
-	console.log(uson.getDistance());
+	console.log(`TOUCH: ${touch.getState()}`);
+	console.log(`MOTION: ${motion.getState()}`);
+	console.log(`USONIC: ${uson.getDistance()}`);
+	console.log(`TEMP: ${dht.readTemp()}`);
+	console.log(`HUMIDITY: ${dht.readHumidity()}`);
 	console.log("----FINISHED READING----");
-
-
-//	readGas();
-//	test();
-//	readMotion();	
 }, 1000);
 
-// function readPin(inputPin) {
-// 	var state = wpi.digitalRead(inputPin);
-// 	var stringBuilder = {"messageId":1, "pin": inputPin, "state":state};
-// 	var json = JSON.stringify(stringBuilder);
-// 	console.log(json);
-// }
-	
 var sensordht = {
 	sensors: [{
 		name: "dht",
@@ -216,62 +222,5 @@ var sensordht = {
 		setTimeout(function() {
 			sensordht.read();
 		}, 2000);
-	}
-}
-
-var sensor = require('node-dht-sensor');
-
-function test() {
-	sensor.read(11, 2, function(err, temperature, humidity) {
-    if (!err) {
-        console.log('temp: ' + temperature.toFixed(1) + '°C, ' +
-            'humidity: ' + humidity.toFixed(1) + '%');
-	} else {
-		console.log(err);
-	}
-    });
-}
-
-var stdin = process.openStdin();
-
-stdin.addListener("data", function(d) {
-	startMotor(d);
-});
-
-function setStep(w1, w2, w3, w4) {
-	wpi.digitalWrite(motor_one, w1);
-	wpi.digitalWrite(motor_two, w2);
-	wpi.digitalWrite(motor_three, w3);
-	wpi.digitalWrite(motor_four, w4);
-}
-
-function startMotor(data) {
-	if (data == 0) {
-		for (var i = 0; i > 100; i++) {
-//		console.log(data + " :data");
-
-		setStep(1,0,0,1);		
-		wpi.delayMicroseconds(1);
-		setStep(0,1,0,1);
-		wpi.delayMicroseconds(1);
-		setStep(0,1,1,0);
-		wpi.delayMicroseconds(1);
-		setStep(1,0,1,0);
-		wpi.delayMicroseconds(1);}
-	} else {
-		setStep(1,0,1,0);
-		wpi.delayMicroseconds(1);
-		setStep(0,1,1,0);
-		wpi.delayMicroseconds(1);
-		setStep(0,1,0,1);
-		wpi.delayMicroseconds(1);
-		setStep(1,0,0,1);
-		wpi.delayMicroseconds(1);
-	}
-	console.log(data.length);
-	if (data.length == 12) {
-		console.log(data.toString().substr(0,3));
-		console.log("data is + " + data);
-		setRGB(data.toString().substr(0,3), data.toString().substr(4,3), data.toString().substr(8,3));
 	}
 }
