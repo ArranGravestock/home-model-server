@@ -5,7 +5,6 @@ var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
 //pins
-var ledpin = 7;
 var trigpin = 29;
 var echopin = 28;
 var motion = 4;
@@ -26,7 +25,7 @@ var motor_three = 24;
 var motor_four = 25;
 
 //set mode
-wpi.pinMode(ledpin, wpi.OUTPUT);
+
 wpi.pinMode(trigpin, wpi.OUTPUT);
 wpi.pinMode(echopin, wpi.INPUT);
 wpi.pinMode(motion, wpi.INPUT);
@@ -58,7 +57,7 @@ class Pin {
 		wpi.pinMode(pin, wpi.OUTPUT);
 	}
 
-	state() {
+	getState() {
 		return this.state;
 	}
 
@@ -66,58 +65,171 @@ class Pin {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
 	}
-}
 
-function setRGB(red, green, blue) {
-	console.log("red:"  +  red + " green: " + green + " blue " + blue);
-	wpi.pwmWrite(r, red);
-	wpi.pwmWrite(g, green);
-	wpi.pwmWrite(b, blue);
-}
-
-function readGas() {
-	console.log(wpi.digitalRead(gas));
-}
-
-function readTouch() {
-	var touch_state = wpi.digitalRead(touch);
-	if (touch_state) {
-		console.log("touch activated");
-	} else {
-		console.log("no touch");
+	getJson() {
+		var arr = {ledid: this.pin, state: this.state};
+		return JSON.stringify(arr);
 	}
 }
 
-function readMotion() {
-	var motion_state = wpi.digitalRead(motion);
-	
-	if (motion_state) {	
-		console.log("motion detected");
-	} else {
-		console.log("no motion");
+
+class RGBPin {
+	constructor(pin) {
+		this.pin = pin;
+		this.rgb = [255,255,255];
+		wpi.pinMode(pin, wpi.OUTPUT);
 	}
-	wpi.delay(500);
+
+	getState() {
+		return this.state;
+	}
+
+	setState(state) {
+		this.state = state;
+		wpi.digitalWrite(this.pin, this.state);
+	}
+
+	setRGB(rgb) {
+		this.rgb = rgb;
+	}
+
+	getJson() {
+		var arr = {ledid: this.pin, state: this.state, rgb: this.rgb}
+		return JSON.stringify(arr);
+	}
 }
 
-function readUsonicSensor() {
-	wpi.digitalWrite(trigpin, 0);
-	wpi.delayMicroseconds(5);
-	wpi.digitalWrite(trigpin, 1);
-	wpi.delayMicroseconds(10);
-	wpi.digitalWrite(trigpin, 0);
-	
-	var pulse_start = wpi.pulseIn(echopin, 1);
-	var distance_cm = pulse_start / 2 / 29.1;
-	console.log(distance_cm.toFixed(2)+ "cm");
+class Touch {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		wpi.pinMode(pin, wpi.INPUT);
+
+		setInterval(() => {
+			var touch_state = wpi.digitalRead(this.pin);
+			this.state = touch_state;
+		}, 2000)
+	}
+
+	getState() {
+		return this.state;
+	}
 }
+
+class Motion {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		wpi.pinMode(pin, wpi.INPUT);
+
+		setInterval(() => {
+			var motion_state = wpi.digitalRead(this.pin);
+			this.state = motion_state;
+		}, 2000)
+	}
+
+	getState() {
+		return this.state;
+	}
+}
+
+
+
+
+
+// function setRGB(red, green, blue) {
+// 	console.log("red:"  +  red + " green: " + green + " blue " + blue);
+// 	wpi.pwmWrite(r, red);
+// 	wpi.pwmWrite(g, green);
+// 	wpi.pwmWrite(b, blue);
+// }
+
+// function readGas() {
+// 	console.log(wpi.digitalRead(gas));
+// }
+
+// function readTouch() {
+// 	var touch_state = wpi.digitalRead(touch);
+// 	if (touch_state) {
+// 		console.log("touch activated");
+// 	} else {
+// 		console.log("no touch");
+// 	}
+// }
+
+// function readMotion() {
+// 	var motion_state = wpi.digitalRead(motion);
+	
+// 	if (motion_state) {	
+// 		console.log("motion detected");
+// 	} else {
+// 		console.log("no motion");
+// 	}
+// 	wpi.delay(500);
+// }
+
+class Ultrasonic {
+	constructor(trigpin, echopin) {
+		this.trigpin = trigpin;
+		this.echopin = echopin;
+		this.distance = 0;
+
+		wpi.pinMode(trigpin, wpi.OUTPUT);
+		wpi.pinMode(echopin, wpi.INPUT);
+
+		setInterval(() => {
+			this.distance = readDistance();
+		}, 2000)
+	}
+
+	readDistance() {
+		wpi.digitalWrite(trigpin, 0);
+		wpi.delayMicroseconds(5);
+		wpi.digitalWrite(trigpin, 1);
+		wpi.delayMicroseconds(10);
+		wpi.digitalWrite(trigpin, 0);
+
+		var pulse_start = wpi.pulseIn(echopin, 1);
+		var distance_cm = pulse_start / 2 / 29.1;
+		return distance_cm.toFixed(2);
+	}
+
+	getDistance() {
+		return this.distance;
+	}
+}
+
+// function readUsonicSensor() {
+// 	wpi.digitalWrite(trigpin, 0);
+// 	wpi.delayMicroseconds(5);
+// 	wpi.digitalWrite(trigpin, 1);
+// 	wpi.delayMicroseconds(10);
+// 	wpi.digitalWrite(trigpin, 0);
+	
+// 	var pulse_start = wpi.pulseIn(echopin, 1);
+// 	var distance_cm = pulse_start / 2 / 29.1;
+// 	console.log(distance_cm.toFixed(2)+ "cm");
+// }
+
+
 var newPin = new Pin(ledpin);
+var touch = new Touch(3);
+var motion = new Motion(4);
+var uson = new Ultrasonic(trigpin, echopin);
+
 
 
 var value = 0;
 setInterval(function() {
 	newPin.setState(value);
-//	wpi.digitalWrite(ledpin, value);
 	value = +!value;
+
+	console.log(touch.getState());
+	console.log(motion.getState());
+	console.log(uson.getDistance());
+
+
+
 //	readGas();
 //	readUsonicSensor();	
 //	readTouch();
@@ -125,12 +237,12 @@ setInterval(function() {
 //	readMotion();	
 }, 300);
 
-function readPin(inputPin) {
-	var state = wpi.digitalRead(inputPin);
-	var stringBuilder = {"messageId":1, "pin": inputPin, "state":state};
-	var json = JSON.stringify(stringBuilder);
-	console.log(json);
-}
+// function readPin(inputPin) {
+// 	var state = wpi.digitalRead(inputPin);
+// 	var stringBuilder = {"messageId":1, "pin": inputPin, "state":state};
+// 	var json = JSON.stringify(stringBuilder);
+// 	console.log(json);
+// }
 	
 var sensordht = {
 	sensors: [{
@@ -154,7 +266,7 @@ var sensordht = {
 var sensor = require('node-dht-sensor');
 
 function test() {
-sensor.read(11, 2, function(err, temperature, humidity) {
+	sensor.read(11, 2, function(err, temperature, humidity) {
     if (!err) {
         console.log('temp: ' + temperature.toFixed(1) + '°C, ' +
             'humidity: ' + humidity.toFixed(1) + '%');
