@@ -1,3 +1,4 @@
+"use strict";
 //run setups
 var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
@@ -109,10 +110,13 @@ function readUsonicSensor() {
 	var distance_cm = pulse_start / 2 / 29.1;
 	console.log(distance_cm.toFixed(2)+ "cm");
 }
+var newPin = new Pin(ledpin);
+
 
 var value = 0;
 setInterval(function() {
-	wpi.digitalWrite(ledpin, value);
+	newPin.setState(value);
+//	wpi.digitalWrite(ledpin, value);
 	value = +!value;
 //	readGas();
 //	readUsonicSensor();	
