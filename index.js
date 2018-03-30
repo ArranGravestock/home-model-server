@@ -4,40 +4,6 @@ var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
-//pins
-var gas = 9;
-var r = 23;
-var g = 24;
-var b = 26;
-
-var spiclk = 14;
-var spimiso = 12;
-var spimosi = 13;
-var spics = 10;
-
-var motor_one = 22;
-var motor_two = 23;
-var motor_three = 24;
-var motor_four = 25;
-
-//set mode
-
-wpi.pinMode(gas, wpi.INPUT);
-
-wpi.pinMode(motor_one, wpi.OUTPUT);
-wpi.pinMode(motor_two, wpi.OUTPUT);
-wpi.pinMode(motor_three, wpi.OUTPUT);
-wpi.pinMode(motor_four, wpi.OUTPUT);
-
-wpi.pinMode(spimosi, wpi.OUTPUT);
-wpi.pinMode(spimiso, wpi.INPUT);
-wpi.pinMode(spiclk, wpi.OUTPUT);
-wpi.pinMode(spics, wpi.OUTPUT);
-
-wpi.pinMode(r, wpi.PWM_OUTPUT);
-wpi.pinMode(g, wpi.PWM_OUTPUT);
-wpi.pinMode(b, wpi.PWM_OUTPUT);
-
 //voltage initiation
 var LOW = 0;
 var HIGH = 1;
@@ -63,7 +29,6 @@ class Pin {
 		return JSON.stringify(arr);
 	}
 }
-
 
 class RGBPin {
 	constructor(pin) {
