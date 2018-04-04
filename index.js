@@ -101,11 +101,11 @@ class Touch {
 		wpi.pinMode(pin, wpi.INPUT);
 
 		SENSOR_ID++;
+	}
 
-		setInterval(() => {
-			var touch_state = wpi.digitalRead(this.pin);
-			this.state = touch_state;
-		}, 2000)
+	readState() {
+		var touch_state = wpi.digitalRead(this.pin);
+		this.state = touch_state;
 	}
 
 	getState() {
@@ -126,13 +126,13 @@ class Motion {
 
 		SENSOR_ID++;
 		
-//		SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
-	
-		setInterval(() => {
-			var motion_state = wpi.digitalRead(this.pin);
-			this.state = motion_state;
-			SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
-		}, 2000)
+		//SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
+	}
+
+	readState() {
+		var motion_state = wpi.digitalRead(this.pin);
+		this.state = motion_state;
+		SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
 	}
 
 	getState() {
@@ -155,10 +155,6 @@ class Ultrasonic {
 
 		wpi.pinMode(trigpin, wpi.OUTPUT);
 		wpi.pinMode(echopin, wpi.INPUT);
-
-		setInterval(() => {
-			this.distance = this.readDistance();
-		}, 2000)
 	}
 
 	readDistance() {
@@ -170,7 +166,7 @@ class Ultrasonic {
 
 		var pulse_start = wpi.pulseIn(this.echopin, 1);
 		var distance_cm = pulse_start / 2 / 29.1;
-		return distance_cm.toFixed(2);
+		this.distance = distance_cm.toFixed(2);
 	}
 
 	getDistance() {
@@ -211,7 +207,7 @@ class DHT {
 	}
 
 	read() {
-		this.sensor.read(this.type, this.pin, function(err, temperature, humidity) {
+		this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
@@ -251,6 +247,12 @@ setInterval(function() {
 	value = +!value;
 	
 	console.log("----STARTED READING----");
+	console.log("-----------------------");
+	
+	touch.readState();
+	motion.readState();
+	uson.readDistance();
+
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
@@ -261,4 +263,4 @@ setInterval(function() {
 	//console.log(`TEMP: ${dht.readTemp()}`);
 	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
 	console.log("----FINISHED READING----\n");
-}, 1000);
+}, 2000);
