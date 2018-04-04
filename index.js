@@ -17,8 +17,7 @@ var SENSOR_ID = 0;
 var JSON_PACKET = {DEVICE_ID: []}
 var SENSORS_PACKET = {SENSORS:[]};
 var LIGHTS_PACKET = {LIGHTS:[]}
-SENSORS.SENSORS.push({"id": 1, "temperature":30});
-SENSORS.SENSORS.push({"id": 2, "motion":1});
+
 
 
 
@@ -29,10 +28,12 @@ function compilePacket(packet) {
 
 	//reset packet
 	JSON_PACKET.DEVICE_ID = [];
+	SENSORS_PACKET.SENSORS = [];
+	LIGHTS_PACKET.LIGHTS = [];
     return jsonPacket;
 }
 
-console.log(compilePacket(JSON_PACKET));
+//console.log(compilePacket(JSON_PACKET));
 
 class LED {
 	constructor(pin) {
@@ -124,10 +125,13 @@ class Motion {
 		wpi.pinMode(pin, wpi.INPUT);
 
 		SENSOR_ID++;
-
+		
+//		SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
+	
 		setInterval(() => {
 			var motion_state = wpi.digitalRead(this.pin);
 			this.state = motion_state;
+			SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
 		}, 2000)
 	}
 
@@ -228,9 +232,9 @@ var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 
-function sendPacket() {
-	var PACKET = compilePacket(JSON_PACKET);
-	
+function sendPacket(jsonpacket) {
+	var PACKET = compilePacket(jsonpacket);
+	console.log(PACKET);
 
 	fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
 		() => console.log("SUCCESS")
@@ -252,7 +256,8 @@ setInterval(function() {
 	console.log(`USONIC: ${uson.getDistance()}`);
 	dht.read();
 	//test();
-	console.log(compilePacket(JSON_PACKET));
+	sendPacket(JSON_PACKET);
+//	console.log(compilePacket(JSON_PACKET));
 	//console.log(`TEMP: ${dht.readTemp()}`);
 	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
 	console.log("----FINISHED READING----\n");
