@@ -14,6 +14,26 @@ var HIGH = 1;
 var DEVICE_ID = "1";
 var SENSOR_ID = 0;
 
+var JSON_PACKET = {DEVICE_ID: []}
+var SENSORS_PACKET = {SENSORS:[]};
+var LIGHTS_PACKET = {LIGHTS:[]}
+SENSORS.SENSORS.push({"id": 1, "temperature":30});
+SENSORS.SENSORS.push({"id": 2, "motion":1});
+
+
+
+function compilePacket(packet) {
+	packet.DEVICE_ID.push(SENSORS_PACKET);
+	packet.DEVICE_ID.push(LIGHTS_PACKET);
+	var jsonPacket = JSON.stringify(JSON_PACKET)
+
+	//reset packet
+	JSON_PACKET.DEVICE_ID = [];
+    return jsonPacket;
+}
+
+console.log(compilePacket(JSON_PACKET));
+
 class LED {
 	constructor(pin) {
 		this.pin = pin;
@@ -31,11 +51,7 @@ class LED {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-	}
-
-	getJson() {
-		var arr = {ledid: this.pin, state: this.state};
-		return JSON.stringify(arr);
+		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state})
 	}
 
 	getID() {
@@ -205,20 +221,26 @@ class DHT {
 	}
 }
 
+//initiate pins associated with device
 var newPin = new LED(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
-var dht = new DHT(2, dhtsensor, 11)
-var value = 0;
+var dht = new DHT(2, dhtsensor, 11);
 
-function test() {
-	fetch(`http://localhost:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
+function sendPacket() {
+	var PACKET = compilePacket(JSON_PACKET);
+	
+
+	fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
 		() => console.log("SUCCESS")
 	).catch(
 		() => console.log("FAILURE")
 	)
 }
+
+//for testing led
+var value = 0;
 
 setInterval(function() {
 	newPin.setState(value);
@@ -228,9 +250,9 @@ setInterval(function() {
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
-	console.log()
 	dht.read();
-	test();
+	//test();
+	console.log(compilePacket(JSON_PACKET));
 	//console.log(`TEMP: ${dht.readTemp()}`);
 	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
 	console.log("----FINISHED READING----\n");
