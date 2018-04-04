@@ -1,18 +1,27 @@
 "use strict";
+const fetch = require('node-fetch');
+
 //run setups
 var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
+
 //voltage initiation
 var LOW = 0;
 var HIGH = 1;
 
-class Pin {
+var DEVICE_ID = "1";
+var SENSOR_ID = 0;
+
+class LED {
 	constructor(pin) {
 		this.pin = pin;
+		this.id = SENSOR_ID;
 		this.state = 0;
 		wpi.pinMode(pin, wpi.OUTPUT);
+
+		SENSOR_ID++;
 	}
 
 	getState() {
@@ -28,13 +37,20 @@ class Pin {
 		var arr = {ledid: this.pin, state: this.state};
 		return JSON.stringify(arr);
 	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class RGBPin {
 	constructor(pin) {
 		this.pin = pin;
 		this.rgb = [255,255,255];
+		this.id = SENSOR_ID;
 		wpi.pinMode(pin, wpi.OUTPUT);
+
+		SENSOR_ID++;
 	}
 
 	getState() {
@@ -54,13 +70,20 @@ class RGBPin {
 		var arr = {ledid: this.pin, state: this.state, rgb: this.rgb}
 		return JSON.stringify(arr);
 	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class Touch {
 	constructor(pin) {
 		this.pin = pin;
 		this.state = 0;
+		this.id = SENSOR_ID;
 		wpi.pinMode(pin, wpi.INPUT);
+
+		SENSOR_ID++;
 
 		setInterval(() => {
 			var touch_state = wpi.digitalRead(this.pin);
@@ -71,13 +94,20 @@ class Touch {
 	getState() {
 		return this.state;
 	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class Motion {
 	constructor(pin) {
 		this.pin = pin;
 		this.state = 0;
+		this.id = SENSOR_ID;
 		wpi.pinMode(pin, wpi.INPUT);
+
+		SENSOR_ID++;
 
 		setInterval(() => {
 			var motion_state = wpi.digitalRead(this.pin);
@@ -88,6 +118,10 @@ class Motion {
 	getState() {
 		return this.state;
 	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class Ultrasonic {
@@ -95,6 +129,9 @@ class Ultrasonic {
 		this.trigpin = trigpin;
 		this.echopin = echopin;
 		this.distance = 0;
+		this.id = SENSOR_ID;
+
+		SENSOR_ID++;
 
 		wpi.pinMode(trigpin, wpi.OUTPUT);
 		wpi.pinMode(echopin, wpi.INPUT);
@@ -119,6 +156,10 @@ class Ultrasonic {
 	getDistance() {
 		return this.distance;
 	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class DHT {
@@ -128,6 +169,9 @@ class DHT {
 		this.sensor = sensor;
 		this.temp = 0;
 		this.humidity = 0;
+		this.id = SENSOR_ID;
+
+		SENSOR_ID++;
 	}
 
 	readTemp() {
@@ -136,6 +180,10 @@ class DHT {
 
 	readHumidity() {
 		return this.humidity;
+	}
+
+	getID() {
+		return this.id;
 	}
 
 	setTemp(temp) {
@@ -157,12 +205,20 @@ class DHT {
 	}
 }
 
-var newPin = new Pin(7);
+var newPin = new LED(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11)
 var value = 0;
+
+function test() {
+	fetch(`http://localhost:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
+		() => console.log("SUCCESS")
+	).catch(
+		() => console.log("FAILURE")
+	)
+}
 
 setInterval(function() {
 	newPin.setState(value);
@@ -172,7 +228,9 @@ setInterval(function() {
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
+	console.log()
 	dht.read();
+	test();
 	//console.log(`TEMP: ${dht.readTemp()}`);
 	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
 	console.log("----FINISHED READING----\n");

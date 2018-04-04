@@ -17,12 +17,13 @@
   },
   "homepage": "https://github.com/ArranGravestock/home-model-server#readme",
   "dependencies": {
-    "express": "^4.16.3",
-    "fs": "0.0.1-security",
-    "mysql": "^2.15.0",
     "node-dht-sensor": "0.0.34",
-    "r-pi-usonic": "^2.5.0",
-    "tedious": "^2.3.1",
+    "node-fetch": "^2.1.2",
     "wiring-pi": "^2.2.1"
-  }
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "presets": ["env"]
 }
