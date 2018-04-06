@@ -30,6 +30,7 @@ function compilePacket(packet) {
 	JSON_PACKET.DEVICE_ID = [];
 	SENSORS_PACKET.SENSORS = [];
 	LIGHTS_PACKET.LIGHTS = [];
+
     return jsonPacket;
 }
 
@@ -77,15 +78,11 @@ class RGBPin {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
+		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state})
 	}
 
 	setRGB(rgb) {
 		this.rgb = rgb;
-	}
-
-	getJson() {
-		var arr = {ledid: this.pin, state: this.state, rgb: this.rgb}
-		return JSON.stringify(arr);
 	}
 
 	getID() {
@@ -106,6 +103,7 @@ class Touch {
 	readState() {
 		var touch_state = wpi.digitalRead(this.pin);
 		this.state = touch_state;
+		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -125,14 +123,12 @@ class Motion {
 		wpi.pinMode(pin, wpi.INPUT);
 
 		SENSOR_ID++;
-		
-		//SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
 	}
 
 	readState() {
 		var motion_state = wpi.digitalRead(this.pin);
 		this.state = motion_state;
-		SENSORS_PACKET.SENSORS.push({"id": this.id, "motion": this.state})
+		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -167,6 +163,8 @@ class Ultrasonic {
 		var pulse_start = wpi.pulseIn(this.echopin, 1);
 		var distance_cm = pulse_start / 2 / 29.1;
 		this.distance = distance_cm.toFixed(2);
+
+		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
 	}
 
 	getDistance() {
