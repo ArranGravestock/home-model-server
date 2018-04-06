@@ -205,24 +205,16 @@ class DHT {
 	}
 
 	read() {
-		var results =  new Promise((resolve, reject) => {
-			this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
-				if (!err) {
-					this.temp = temperature.toFixed(1);
-					this.humidity = humidity.toFixed(1);
-					var result = [this.temp, this.humidity];
-				//console.log(result);
-					resolve(result);
-				} else {
-					reject(err);
-				}
-			})
+		this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
+			if (!err) {
+				this.temp = temperature.toFixed(1);
+				this.humidity = humidity.toFixed(1);
+				SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity})
+			} else {
+				//handle the error somehow
+			}
 		})
-		results.catch((results) => {
-			this.temp = results[0];
-			this.humidity = results[1];
-			SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity})
-		})
+		//SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity});
 	}
 }
 
