@@ -164,7 +164,7 @@ class Ultrasonic {
 		var distance_cm = pulse_start / 2 / 29.1;
 		this.distance = distance_cm.toFixed(2);
 
-		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
+		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.distance})
 	}
 
 	getDistance() {
