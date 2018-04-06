@@ -205,19 +205,39 @@ class DHT {
 	}
 
 	read() {
-		this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
+		var results =  new Promise(this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
 				var result = [this.temp, this.humidity];
-				console.log(result);
-				//callback(result)
+				//console.log(result);
+				resolve(result);
 			} else {
-				//callback(err);
+				reject(err);
 			}
+		}))
+		results.catch((results) => {
+			this.temp = results[0];
+			this.humidity = results[1];
 		})
 	}
 }
+
+function sendPacket(jsonpacket) {
+	var PACKET = compilePacket(jsonpacket);
+	console.log(PACKET);
+
+	// fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
+	// 	() => console.log("SUCCESS")
+	// ).catch(
+	// 	() => console.log("FAILURE")
+	// )
+}
+
+//for testing led
+var value = 0;
+
+
 
 //initiate pins associated with device
 var newPin = new LED(7);
@@ -226,39 +246,28 @@ var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 
-function sendPacket(jsonpacket) {
-	var PACKET = compilePacket(jsonpacket);
-	console.log(PACKET);
-
-	fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
-		() => console.log("SUCCESS")
-	).catch(
-		() => console.log("FAILURE")
-	)
-}
-
-//for testing led
-var value = 0;
 
 setInterval(function() {
-	newPin.setState(value);
-	value = +!value;
 	
+	value = +!value;
+
+	newPin.setState(value);
+
 	console.log("----STARTED READING----");
 	console.log("-----------------------");
 	
 	touch.readState();
 	motion.readState();
 	uson.readDistance();
+	dht.read();
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
-	dht.read();
-	//test();
-	sendPacket(JSON_PACKET);
-//	console.log(compilePacket(JSON_PACKET));
 	//console.log(`TEMP: ${dht.readTemp()}`);
 	//console.log(`HUMIDITY: ${dht.readHumidity()}`);
+
+	sendPacket(JSON_PACKET);
+
 	console.log("----FINISHED READING----\n");
 }, 2000);
