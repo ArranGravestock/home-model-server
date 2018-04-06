@@ -221,6 +221,7 @@ class DHT {
 		results.catch((results) => {
 			this.temp = results[0];
 			this.humidity = results[1];
+			SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity})
 		})
 	}
 }
@@ -269,7 +270,10 @@ setInterval(function() {
 	console.log(`TEMP: ${dht.readTemp()}`);
 	console.log(`HUMIDITY: ${dht.readHumidity()}`);
 
-	sendPacket(JSON_PACKET);
-
 	console.log("----FINISHED READING----\n");
+
+	console.log("----COMPILING PACKET----");
+	console.log("------------------------");
+	sendPacket(JSON_PACKET);
+	console.log("---FINISHED COMPILING---\n");
 }, 2000);
