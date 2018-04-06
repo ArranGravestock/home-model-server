@@ -6,7 +6,6 @@ var wpi = require('wiring-pi');
 var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
-
 //voltage initiation
 var LOW = 0;
 var HIGH = 1;
@@ -17,9 +16,6 @@ var SENSOR_ID = 0;
 var JSON_PACKET = {DEVICE_ID: []}
 var SENSORS_PACKET = {SENSORS:[]};
 var LIGHTS_PACKET = {LIGHTS:[]}
-
-
-
 
 function compilePacket(packet) {
 	packet.DEVICE_ID.push(SENSORS_PACKET);
@@ -33,8 +29,6 @@ function compilePacket(packet) {
 
     return jsonPacket;
 }
-
-//console.log(compilePacket(JSON_PACKET));
 
 class LED {
 	constructor(pin) {
@@ -78,7 +72,7 @@ class RGBPin {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state})
+		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
 	}
 
 	setRGB(rgb) {
@@ -221,12 +215,13 @@ class DHT {
 function sendPacket(jsonpacket) {
 	var PACKET = compilePacket(jsonpacket);
 	console.log(PACKET);
+	//http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}
 
-	// fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}`, {method: 'PUT'}).then(
-	// 	() => console.log("SUCCESS")
-	// ).catch(
-	// 	() => console.log("FAILURE")
-	// )
+	fetch(`http://192.168.1.88:3000/reading`, {method: 'PUT', body: PACKET}).then(
+		() => console.log("SUCCESS")
+	).catch(
+		() => console.log("FAILURE")
+	)
 }
 
 //for testing led
