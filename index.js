@@ -13,13 +13,13 @@ var HIGH = 1;
 var DEVICE_ID = "1";
 var SENSOR_ID = 0;
 
-var JSON_PACKET = {DEVICE_ID: []}
+var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}
 
 function compilePacket(packet) {
 	var jsonPacket = JSON.stringify(JSON_PACKET)
 
 	//reset packet
-	JSON_PACKET.DEVICE_ID = [];
+	JSON_PACKET.THINGS = [];
 
     return jsonPacket;
 }
@@ -41,7 +41,7 @@ class LED {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getID() {
@@ -66,7 +66,7 @@ class RGBPin {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state, "rgb": this.rgb})
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
 	}
 
 	setRGB(rgb) {
@@ -91,7 +91,7 @@ class Touch {
 	readState() {
 		var touch_state = wpi.digitalRead(this.pin);
 		this.state = touch_state;
-		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -116,7 +116,7 @@ class Motion {
 	readState() {
 		var motion_state = wpi.digitalRead(this.pin);
 		this.state = motion_state;
-		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -152,7 +152,7 @@ class Ultrasonic {
 		var distance_cm = pulse_start / 2 / 29.1;
 		this.distance = distance_cm.toFixed(2);
 
-		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.distance})
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.distance})
 	}
 
 	getDistance() {
@@ -200,8 +200,8 @@ class DHT {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
-				JSON_PACKET.DEVICE_ID.push({"id": this.temp_id, "state": this.temp})
-				JSON_PACKET.DEVICE_ID.push({"id": this.humidity_id, "state": this.humidity})
+				JSON_PACKET.THINGS.push({"id": this.temp_id, "state": this.temp})
+				JSON_PACKET.THINGS.push({"id": this.humidity_id, "state": this.humidity})
 			} else {
 				//handle the error somehow
 			}
