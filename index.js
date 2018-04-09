@@ -14,18 +14,12 @@ var DEVICE_ID = "1";
 var SENSOR_ID = 0;
 
 var JSON_PACKET = {DEVICE_ID: []}
-var SENSORS_PACKET = {SENSORS:[]};
-var LIGHTS_PACKET = {LIGHTS:[]}
 
 function compilePacket(packet) {
-	packet.DEVICE_ID.push(SENSORS_PACKET);
-	packet.DEVICE_ID.push(LIGHTS_PACKET);
 	var jsonPacket = JSON.stringify(JSON_PACKET)
 
 	//reset packet
 	JSON_PACKET.DEVICE_ID = [];
-	SENSORS_PACKET.SENSORS = [];
-	LIGHTS_PACKET.LIGHTS = [];
 
     return jsonPacket;
 }
@@ -47,7 +41,7 @@ class LED {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state})
+		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
 	}
 
 	getID() {
@@ -72,7 +66,7 @@ class RGBPin {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		LIGHTS_PACKET.LIGHTS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
+		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state, "rgb": this.rgb})
 	}
 
 	setRGB(rgb) {
@@ -97,7 +91,7 @@ class Touch {
 	readState() {
 		var touch_state = wpi.digitalRead(this.pin);
 		this.state = touch_state;
-		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
+		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -122,7 +116,7 @@ class Motion {
 	readState() {
 		var motion_state = wpi.digitalRead(this.pin);
 		this.state = motion_state;
-		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.state})
+		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -158,7 +152,7 @@ class Ultrasonic {
 		var distance_cm = pulse_start / 2 / 29.1;
 		this.distance = distance_cm.toFixed(2);
 
-		SENSORS_PACKET.SENSORS.push({"id": this.id, "state": this.distance})
+		JSON_PACKET.DEVICE_ID.push({"id": this.id, "state": this.distance})
 	}
 
 	getDistance() {
@@ -206,13 +200,12 @@ class DHT {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
-				SENSORS_PACKET.SENSORS.push({"id": this.temp_id, "state": this.temp})
-				SENSORS_PACKET.SENSORS.push({"id": this.humidity_id, "state": this.humidity})
+				JSON_PACKET.DEVICE_ID.push({"id": this.temp_id, "state": this.temp})
+				JSON_PACKET.DEVICE_ID.push({"id": this.humidity_id, "state": this.humidity})
 			} else {
 				//handle the error somehow
 			}
 		})
-		//SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity});
 	}
 }
 
