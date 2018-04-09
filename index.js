@@ -177,9 +177,12 @@ class DHT {
 		this.sensor = sensor;
 		this.temp = 0;
 		this.humidity = 0;
-		this.id = SENSOR_ID;
+		// this.id = SENSOR_ID;
 
-		SENSOR_ID++;
+		this.temp_id = SENSOR_ID;
+		this.humidity_id = SENSOR_ID + 1;
+
+		SENSOR_ID = SENSOR_ID+2;
 	}
 
 	readTemp() {
@@ -203,7 +206,8 @@ class DHT {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
-				SENSORS_PACKET.SENSORS.push({"id": this.id, "temperature": this.temp, "humidity": this.humidity})
+				SENSORS_PACKET.SENSORS.push({"id": this.temp_id, "temperature": this.temp})
+				SENSORS_PACKET.SENSORS.push({"id": this.humidity_id, "humidity": this.humidity})
 			} else {
 				//handle the error somehow
 			}
