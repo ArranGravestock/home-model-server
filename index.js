@@ -11,7 +11,7 @@ var LOW = 0;
 var HIGH = 1;
 
 var DEVICE_ID = "1";
-var SENSOR_ID = 0;
+var SENSOR_ID = 1;
 
 var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}
 
