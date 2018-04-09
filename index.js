@@ -206,8 +206,8 @@ class DHT {
 			if (!err) {
 				this.temp = temperature.toFixed(1);
 				this.humidity = humidity.toFixed(1);
-				SENSORS_PACKET.SENSORS.push({"id": this.temp_id, "temperature": this.temp})
-				SENSORS_PACKET.SENSORS.push({"id": this.humidity_id, "humidity": this.humidity})
+				SENSORS_PACKET.SENSORS.push({"id": this.temp_id, "state": this.temp})
+				SENSORS_PACKET.SENSORS.push({"id": this.humidity_id, "state": this.humidity})
 			} else {
 				//handle the error somehow
 			}
@@ -221,7 +221,7 @@ function sendPacket(jsonpacket) {
 	console.log(PACKET);
 	//http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}
 
-	fetch(`http://192.168.1.88:3000/reading`, {method: 'PUT', body: PACKET}).then(
+	fetch(`http://192.168.1.88:3000/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET}).then(
 		() => console.log("SUCCESS")
 	).catch(
 		() => console.log("FAILURE")
