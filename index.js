@@ -28,7 +28,7 @@ class LED {
 	constructor(pin) {
 		this.pin = pin;
 		this.id = SENSOR_ID;
-		this.state = 0;
+		this.state = this.fetchState();
 		wpi.pinMode(pin, wpi.OUTPUT);
 
 		SENSOR_ID++;
@@ -44,8 +44,8 @@ class LED {
 		// JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
-	fetchState = () => {
-		fetch(`http://localhost:3000/device/${DEVICE_ID}/light/${this.id}}`, 
+	fetchState() {
+		fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/light/${this.id}`, 
 			{
 				method: 'GET', 
 				credentials: 'include',
@@ -57,7 +57,10 @@ class LED {
 		)
 		.then(res => res.json())
 		.then(json => {
-			this.setState(json.state);
+			//console.log(json[0].ThingState);
+			var state = json[0].ThingState;
+			console.log("STATE:: " + state);
+			this.setState(state);
 		})
 		.catch(err => {
 			console.log(err);
@@ -241,10 +244,6 @@ function sendPacket(jsonpacket) {
 	)
 }
 
-//for testing led
-var value = 0;
-
-
 
 //initiate pins associated with device
 var newPin = new LED(7);
@@ -253,13 +252,8 @@ var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 
-
 setInterval(function() {
 	
-	value = +!value;
-
-	newPin.setState(value);
-
 	console.log("----STARTED READING----");
 	console.log("-----------------------");
 	
@@ -267,6 +261,8 @@ setInterval(function() {
 	motion.readState();
 	uson.readDistance();
 	dht.read();
+	newPin.fetchState();
+
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
