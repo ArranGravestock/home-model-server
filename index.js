@@ -41,7 +41,27 @@ class LED {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+		// JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+	}
+
+	fetchState = () => {
+		fetch(`http://localhost:3000/device/${DEVICE_ID}/light/${this.id}}`, 
+			{
+				method: 'GET', 
+				credentials: 'include',
+				headers: {
+					'content-type':'application/json',
+					'access-control-allow-origin':'*'
+				}
+			}
+		)
+		.then(res => res.json())
+		.then(json => {
+			this.setState(json.state);
+		})
+		.catch(err => {
+			console.log(err);
+		})
 	}
 
 	getID() {
@@ -66,7 +86,7 @@ class RGBPin {
 	setState(state) {
 		this.state = state;
 		wpi.digitalWrite(this.pin, this.state);
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
+		// JSON_PACKET.THINGS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
 	}
 
 	setRGB(rgb) {
