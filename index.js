@@ -24,6 +24,37 @@ function compilePacket(packet) {
     return jsonPacket;
 }
 
+class Fan {
+	constructor(pin) {
+		this.pin = pin;
+		this.id = SENSOR_ID;
+		this.state = 0;
+		wpi.pinMode(pin, wpi.OUTPUT);
+		
+		SENSOR_ID++;
+	}
+
+	getState() {
+		return this.state
+	}
+	
+	setState(state) {
+		this.state = state;
+		console.log("STATE SET");
+		wpi.digitalWrite(this.pin, state);
+	}
+
+	start() {
+	setInterval(() => {
+		if (touch.getState()) {
+			this.setState(1);
+		} else {
+			this.setState(0);
+		}
+	}, 2000)
+	}
+}
+
 class LED {
 	constructor(pin) {
 		this.pin = pin;
@@ -40,8 +71,7 @@ class LED {
 
 	setState(state) {
 		this.state = state;
-		wpi.digitalWrite(this.pin, this.state);
-		// JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+		wpi.digitalWrite(this.pin, state);
 	}
 
 	fetchState() {
@@ -57,10 +87,13 @@ class LED {
 		)
 		.then(res => res.json())
 		.then(json => {
-			//console.log(json[0].ThingState);
 			var state = json[0].ThingState;
-			console.log("STATE:: " + state);
-			this.setState(state);
+			//not sure why this is caused...
+			if (state) {
+				this.setState(0)
+			} else {
+				this.setState(1)
+			}
 		})
 		.catch(err => {
 			console.log(err);
@@ -251,6 +284,12 @@ var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
+var fan = new Fan(0);
+var fanz = new Fan(2);
+
+//fan.setState(1);
+fan.start();
+fanz.start();
 
 setInterval(function() {
 	
@@ -262,7 +301,6 @@ setInterval(function() {
 	uson.readDistance();
 	dht.read();
 	newPin.fetchState();
-
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
