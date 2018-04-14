@@ -206,6 +206,56 @@ class Motion {
 	}
 }
 
+class Water {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		this.id = SENSOR_ID;
+		wpi.pinMode(pin, wpi.INPUT);
+
+		SENSOR_ID++;
+	}
+
+	readState() {
+		var water_state = wpi.digitalRead(this.pin);
+		this.state = water_state;
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	getID() {
+		return this.id;
+	}
+}
+
+class Flame {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		this.id = SENSOR_ID;
+		wpi.pinMode(pin, wpi.INPUT);
+
+		SENSOR_ID++;
+	}
+
+	readState() {
+		var flame_state = wpi.digitalRead(this.pin);
+		this.state = flame_state;
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	getID() {
+		return this.id;
+	}
+}
+
 class Ultrasonic {
 	constructor(trigpin, echopin) {
 		this.trigpin = trigpin;
@@ -308,6 +358,8 @@ var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 var fan = new Fan(0);
 var fanz = new Fan(2);
+var water = new Water(1);
+var flame = new Flame(4);
 
 setInterval(function() {
 	
@@ -321,17 +373,24 @@ setInterval(function() {
 	newPin.fetchState();
 	fan.fetchState();
 	fanz.fetchState();	
+	water.readState();
+	flame.readState();
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
 	console.log(`TEMP: ${dht.readTemp()}`);
 	console.log(`HUMIDITY: ${dht.readHumidity()}`);
+	console.log(`WATER: ${water.getState()}`);
+	console.log(`FAN-1: ${fan.getState()}`);
+	console.log(`FAN-2: ${fanz.getState()}`);
+	console.log(`FLAME: ${flame.getState()}`)
 
+	console.log("-----------------------");
 	console.log("----FINISHED READING----\n");
 
-	console.log("----COMPILING PACKET----");
-	console.log("------------------------");
+	// console.log("----COMPILING PACKET----");
+	// console.log("------------------------");
 	sendPacket(JSON_PACKET);
-	console.log("---FINISHED COMPILING---\n");
+	// console.log("---FINISHED COMPILING---\n");
 }, 2000);
