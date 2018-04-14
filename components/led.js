@@ -48,4 +48,4 @@ class LED {
 	}
 }
 
-export default LED;
+module.exports.LED = LED;

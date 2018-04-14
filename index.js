@@ -11,7 +11,7 @@ var LOW = 0;
 var HIGH = 1;
 
 //import classes
-import LED from './components/led';
+var LED = require('./components/led');
 
 var DEVICE_ID = "1";
 var SENSOR_ID = 1;
