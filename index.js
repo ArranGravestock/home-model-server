@@ -114,7 +114,12 @@ class Fan {
 		.then(json => {
 			var state = json[0].ThingState;
 			//not sure why this is caused...
-			this.setState(this.state);
+			if (state) {
+				this.setState(1);
+			} else {
+				this.setState(0);
+			}
+			//this.setState(this.state);
 		})
 		.catch(err => {
 			console.log(err);
@@ -304,10 +309,6 @@ var dht = new DHT(2, dhtsensor, 11);
 var fan = new Fan(0);
 var fanz = new Fan(2);
 
-//fan.setState(1);
-fan.start();
-fanz.start();
-
 setInterval(function() {
 	
 	console.log("----STARTED READING----");
@@ -318,6 +319,8 @@ setInterval(function() {
 	uson.readDistance();
 	dht.read();
 	newPin.fetchState();
+	fan.fetchState();
+	fanz.fetchState();	
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
