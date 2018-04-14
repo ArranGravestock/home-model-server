@@ -1,3 +1,5 @@
+"use strict";
+
 class LED {
 	constructor(pin) {
 		this.pin = pin;
