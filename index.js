@@ -11,11 +11,14 @@ var LOW = 0;
 var HIGH = 1;
 
 //import classes
-var LED = require('./components/led').LED;
 
+
+//set device defaults
 var DEVICE_ID = "1";
+var FETCH_IP = "http://192.168.1.88:3000"
 var SENSOR_ID = 1;
 
+//initiate an empty packet
 var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}
 
 function compilePacket(packet) {
@@ -25,6 +28,56 @@ function compilePacket(packet) {
 	JSON_PACKET.THINGS = [];
 
     return jsonPacket;
+}
+
+class LED {
+	constructor(pin) {
+		this.pin = pin;
+		this.id = SENSOR_ID;
+		this.state = this.fetchState();
+		wpi.pinMode(pin, wpi.OUTPUT);
+
+		SENSOR_ID++;
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	setState(state) {
+		this.state = state;
+		wpi.digitalWrite(this.pin, state);
+	}
+
+	fetchState() {
+		fetch(`${FETCH_IP}/device/${DEVICE_ID}/light/${this.id}`, 
+			{
+				method: 'GET', 
+				credentials: 'include',
+				headers: {
+					'content-type':'application/json',
+					'access-control-allow-origin':'*'
+				}
+			}
+		)
+		.then(res => res.json())
+		.then(json => {
+			var state = json[0].ThingState;
+			//not sure why this is caused...
+			if (state) {
+				this.setState(0)
+			} else {
+				this.setState(1)
+			}
+		})
+		.catch(err => {
+			console.log(err);
+		})
+	}
+
+	getID() {
+		return this.id;
+	}
 }
 
 class Fan {
@@ -43,22 +96,31 @@ class Fan {
 	
 	setState(state) {
 		this.state = state;
-		console.log("STATE SET");
 		wpi.digitalWrite(this.pin, state);
 	}
 
-	start() {
-	setInterval(() => {
-		if (touch.getState()) {
-			this.setState(1);
-		} else {
-			this.setState(0);
-		}
-	}, 2000)
+	fetchState() {
+		fetch(`${FETCH_IP}/device/${DEVICE_ID}/remote/${this.id}`, 
+			{
+				method: 'GET', 
+				credentials: 'include',
+				headers: {
+					'content-type':'application/json',
+					'access-control-allow-origin':'*'
+				}
+			}
+		)
+		.then(res => res.json())
+		.then(json => {
+			var state = json[0].ThingState;
+			//not sure why this is caused...
+			this.setState(this.state);
+		})
+		.catch(err => {
+			console.log(err);
+		})
 	}
 }
-
-
 
 class RGBPin {
 	constructor(pin) {
@@ -223,9 +285,9 @@ class DHT {
 function sendPacket(jsonpacket) {
 	var PACKET = compilePacket(jsonpacket);
 	console.log(PACKET);
-	//http://192.168.1.88:3000/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}
+	//${FETCH_IP}/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}
 
-	fetch(`http://192.168.1.88:3000/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET}).then(
+	fetch(`${FETCH_IP}/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET}).then(
 		() => console.log("SUCCESS")
 	).catch(
 		() => console.log("FAILURE")
