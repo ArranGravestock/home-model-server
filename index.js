@@ -11,7 +11,7 @@ var LOW = 0;
 var HIGH = 1;
 
 //import classes
-var Touch = require("./components/touch");
+//var Touch = require("./components/touch");
 
 //set device defaults
 var DEVICE_ID = "UBVXug97hdIAwOM";
@@ -120,7 +120,7 @@ class Fan {
 	constructor(pin) {
 		this.pin = pin;
 		this.id = pin;
-		this.state = fetchState();
+		this.state = this.fetchState();
 		wpi.pinMode(pin, wpi.OUTPUT);
 		
 	}
@@ -233,7 +233,7 @@ class Ultrasonic {
 		this.trigpin = trigpin;
 		this.echopin = echopin;
 		this.distance = this.readDistance();
-		this.id = pin;
+		this.id = trigpin;
 
 		wpi.pinMode(trigpin, wpi.OUTPUT);
 		wpi.pinMode(echopin, wpi.INPUT);
@@ -338,8 +338,7 @@ setInterval(function() {
 	dht.read();
 	led.fetchState();
 	fan.fetchState();
-	fanz.fetchState();	
-	water.readState();
+	fanz.fetchState();
 	vibration.readState();
 	sound.readState();
 
@@ -347,7 +346,7 @@ setInterval(function() {
 	JSON_PACKET.THINGS.push({"id": motion.getID(), "state": motion.getState()})
 	JSON_PACKET.THINGS.push({"id": vibration.getID(), "state": vibration.getState()})
 	JSON_PACKET.THINGS.push({"id": sound.getID(), "state": sound.getState()})
-	JSON_PACKET.THINGS.push({"id": uson.getID(), "state": uson.getState()})
+	JSON_PACKET.THINGS.push({"id": uson.getID(), "state": uson.getDistance()})
 	JSON_PACKET.THINGS.push({"id": dht.getID("humid"), "state": dht.getHumidity()})
 	JSON_PACKET.THINGS.push({"id": dht.getID("humidity"), "state": dht.getTemp()})
 
@@ -356,11 +355,10 @@ setInterval(function() {
 	console.log(`USONIC: ${uson.getDistance()}`);
 	console.log(`TEMP: ${dht.getTemp()}`);
 	console.log(`HUMIDITY: ${dht.getHumidity()}`);
-	console.log(`WATER: ${water.getState()}`);
 	console.log(`FAN-1: ${fan.getState()}`);
 	console.log(`FAN-2: ${fanz.getState()}`);
 	console.log(`VIBRATION: ${vibration.getState()}`)
-	console.log(`VIBRATION: ${sound.getState()}`)
+	console.log(`SOUND: ${sound.getState()}`)
 
 	console.log("-----------------------");
 	console.log("----FINISHED READING----\n");
