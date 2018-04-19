@@ -1,3 +1,4 @@
+"use strict";
 var wpi = require('wiring-pi');
 class Touch {
 	constructor(pin) {
