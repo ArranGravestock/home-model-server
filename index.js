@@ -219,7 +219,6 @@ class Water {
 	readState() {
 		var water_state = wpi.digitalRead(this.pin);
 		this.state = water_state;
-		console.log("WATER STATE: " + water_state + " " + this.pin);
 		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
@@ -381,10 +380,11 @@ var newPin = new LED(7);
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
-var dht = new DHT(2, dhtsensor, 11);
+//dht uses bcm pin not wpi
+var dht = new DHT(26, dhtsensor, 11);
 var fan = new Fan(0);
 var fanz = new Fan(2);
-var water = new Water(11);
+var water = new Water(6);
 var vibration = new Vibration(5);
 var sound = new Sound(26)
 
