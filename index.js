@@ -219,6 +219,10 @@ class Ultrasonic {
 		wpi.pinMode(echopin, wpi.INPUT);
 	}
 
+	setDistance(distance) {
+		this.distance = distance
+	}
+
 	readDistance() {
 		wpi.digitalWrite(this.trigpin, 0);
 		wpi.delayMicroseconds(5);
@@ -228,7 +232,7 @@ class Ultrasonic {
 
 		var pulse_start = wpi.pulseIn(this.echopin, 1);
 		var distance_cm = pulse_start / 2 / 29.1;
-		return distance_cm.toFixed(2);
+		this.setDistance(distance_cm.toFixed(2));
 	}
 
 	getDistance() {
@@ -301,7 +305,7 @@ var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
 var dht = new DHT(26, dhtsensor, 11); //dht uses bcm not wPi pin
 var vibration = new Vibration(5);
-var sound = new Sound(26)
+var sound = new Sound(22)
 
 setInterval(function() {
 	
@@ -327,8 +331,8 @@ setInterval(function() {
 	JSON_PACKET.THINGS.push({"id": vibration.getID(), "state": vibration.getState()})
 	JSON_PACKET.THINGS.push({"id": sound.getID(), "state": sound.getState()})
 	JSON_PACKET.THINGS.push({"id": uson.getID(), "state": uson.getDistance()})
-	JSON_PACKET.THINGS.push({"id": dht.getID("humid"), "state": dht.getHumidity()})
-	JSON_PACKET.THINGS.push({"id": dht.getID("humidity"), "state": dht.getTemp()})
+	JSON_PACKET.THINGS.push({"id": dht.getID("humidity"), "state": dht.getHumidity()})
+	JSON_PACKET.THINGS.push({"id": dht.getID("temp"), "state": dht.getTemp()})
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
