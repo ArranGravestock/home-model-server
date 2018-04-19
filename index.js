@@ -11,7 +11,7 @@ var LOW = 0;
 var HIGH = 1;
 
 //import classes
-//var Touch = require("./components/touch");
+var Touch = require("./components/touch");
 
 //set device defaults
 var DEVICE_ID = "UBVXug97hdIAwOM";
@@ -46,27 +46,7 @@ function sendPacket(jsonpacket) {
 }
 
 //create components
-class Touch {
-	constructor(pin) {
-		this.pin = pin;
-		this.state = wpi.digitalRead(pin);
-		this.id = pin;
-		wpi.pinMode(pin, wpi.INPUT);
-	}
 
-	readState() {
-		var touch_state = wpi.digitalRead(this.pin);
-		this.state = touch_state;
-	}
-
-	getState() {
-		return this.state;
-	}
-
-	getID() {
-		return this.id;
-	}
-}
 
 class LED {
 	constructor(pin) {
