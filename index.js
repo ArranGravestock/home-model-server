@@ -257,6 +257,31 @@ class Vibration {
 	}
 }
 
+class Sound {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = 0;
+		this.id = SENSOR_ID;
+		wpi.pinMode(pin, wpi.INPUT);
+
+		SENSOR_ID++;
+	}
+
+	readState() {
+		var sound_state = wpi.digitalRead(this.pin);
+		this.state = !sound_state;
+		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	getID() {
+		return this.id;
+	}
+}
+
 class Ultrasonic {
 	constructor(trigpin, echopin) {
 		this.trigpin = trigpin;
@@ -361,6 +386,7 @@ var fan = new Fan(0);
 var fanz = new Fan(2);
 var water = new Water(11);
 var vibration = new Vibration(5);
+var sound = new Sound(26)
 
 setInterval(function() {
 	
@@ -376,6 +402,7 @@ setInterval(function() {
 	fanz.fetchState();	
 	water.readState();
 	vibration.readState();
+	sound.readState();
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
@@ -386,6 +413,7 @@ setInterval(function() {
 	console.log(`FAN-1: ${fan.getState()}`);
 	console.log(`FAN-2: ${fanz.getState()}`);
 	console.log(`VIBRATION: ${vibration.getState()}`)
+	console.log(`VIBRATION: ${sound.getState()}`)
 
 	console.log("-----------------------");
 	console.log("----FINISHED READING----\n");
