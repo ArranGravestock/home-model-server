@@ -232,7 +232,7 @@ class Water {
 	}
 }
 
-class Flame {
+class Vibration {
 	constructor(pin) {
 		this.pin = pin;
 		this.state = 0;
@@ -243,8 +243,8 @@ class Flame {
 	}
 
 	readState() {
-		var flame_state = wpi.digitalRead(this.pin);
-		this.state = flame_state;
+		var vibration_state = wpi.digitalRead(this.pin);
+		this.state = vibration_state;
 		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
@@ -359,8 +359,8 @@ var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 var fan = new Fan(0);
 var fanz = new Fan(2);
-var water = new Water(6);
-var flame = new Flame(5);
+var water = new Water(11);
+var vibration = new Vibration(5);
 
 setInterval(function() {
 	
@@ -375,7 +375,7 @@ setInterval(function() {
 	fan.fetchState();
 	fanz.fetchState();	
 	water.readState();
-	flame.readState();
+	vibration.readState();
 
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
@@ -385,7 +385,7 @@ setInterval(function() {
 	console.log(`WATER: ${water.getState()}`);
 	console.log(`FAN-1: ${fan.getState()}`);
 	console.log(`FAN-2: ${fanz.getState()}`);
-	console.log(`FLAME: ${flame.getState()}`)
+	console.log(`VIBRATION: ${vibration.getState()}`)
 
 	console.log("-----------------------");
 	console.log("----FINISHED READING----\n");
