@@ -50,7 +50,7 @@ class LED {
 	}
 
 	fetchState() {
-		fetch(`${FETCH_IP}/device/${DEVICE_ID}/light/${this.id}`, 
+		fetch(`${FETCH_IP}/device/${DEVICE_ID}/type/light/${this.id}`, 
 			{
 				method: 'GET', 
 				credentials: 'include',
@@ -100,7 +100,7 @@ class Fan {
 	}
 
 	fetchState() {
-		fetch(`${FETCH_IP}/device/${DEVICE_ID}/remote/${this.id}`, 
+		fetch(`${FETCH_IP}/device/${DEVICE_ID}/type/remote/${this.id}`, 
 			{
 				method: 'GET', 
 				credentials: 'include',
@@ -219,6 +219,7 @@ class Water {
 	readState() {
 		var water_state = wpi.digitalRead(this.pin);
 		this.state = water_state;
+		console.log("WATER STATE: " + water_state + " " + this.pin);
 		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
@@ -358,8 +359,8 @@ var uson = new Ultrasonic(29, 28);
 var dht = new DHT(2, dhtsensor, 11);
 var fan = new Fan(0);
 var fanz = new Fan(2);
-var water = new Water(1);
-var flame = new Flame(4);
+var water = new Water(6);
+var flame = new Flame(5);
 
 setInterval(function() {
 	
