@@ -14,9 +14,8 @@ var HIGH = 1;
 var Touch = require("./components/touch");
 
 //set device defaults
-var DEVICE_ID = "1";
+var DEVICE_ID = "UBVXug97hdIAwOM";
 var FETCH_IP = "http://192.168.1.88:3000"
-var SENSOR_ID = 1;
 
 //initiate an empty packet
 var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}
@@ -30,14 +29,51 @@ function compilePacket(packet) {
     return jsonPacket;
 }
 
+
+function sendPacket(jsonpacket) {
+	var PACKET = compilePacket(jsonpacket);
+	console.log(PACKET);
+
+	fetch(`${FETCH_IP}/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET})
+	.then((res) => {
+		if(res.ok) {
+			console.log("SUCCESS")
+		} else {
+			console.log("FAILURE")
+		}
+	})
+	.catch(() => console.log("ERROR"))
+}
+
+//create components
+class Touch {
+	constructor(pin) {
+		this.pin = pin;
+		this.state = wpi.digitalRead(pin);
+		this.id = pin;
+		wpi.pinMode(pin, wpi.INPUT);
+	}
+
+	readState() {
+		var touch_state = wpi.digitalRead(this.pin);
+		this.state = touch_state;
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	getID() {
+		return this.id;
+	}
+}
+
 class LED {
 	constructor(pin) {
 		this.pin = pin;
-		this.id = SENSOR_ID;
+		this.id = pin;
 		this.state = this.fetchState();
 		wpi.pinMode(pin, wpi.OUTPUT);
-
-		SENSOR_ID++;
 	}
 
 	getState() {
@@ -83,11 +119,10 @@ class LED {
 class Fan {
 	constructor(pin) {
 		this.pin = pin;
-		this.id = SENSOR_ID;
-		this.state = 0;
+		this.id = pin;
+		this.state = fetchState();
 		wpi.pinMode(pin, wpi.OUTPUT);
 		
-		SENSOR_ID++;
 	}
 
 	getState() {
@@ -127,76 +162,17 @@ class Fan {
 	}
 }
 
-class RGBPin {
-	constructor(pin) {
-		this.pin = pin;
-		this.rgb = [255,255,255];
-		this.id = SENSOR_ID;
-		wpi.pinMode(pin, wpi.OUTPUT);
-
-		SENSOR_ID++;
-	}
-
-	getState() {
-		return this.state;
-	}
-
-	setState(state) {
-		this.state = state;
-		wpi.digitalWrite(this.pin, this.state);
-		// JSON_PACKET.THINGS.push({"id": this.id, "state": this.state, "rgb": this.rgb})
-	}
-
-	setRGB(rgb) {
-		this.rgb = rgb;
-	}
-
-	getID() {
-		return this.id;
-	}
-}
-
-
-
 class Motion {
 	constructor(pin) {
 		this.pin = pin;
-		this.state = 0;
-		this.id = SENSOR_ID;
+		this.state = wpi.digitalRead(pin);
+		this.id = pin;
 		wpi.pinMode(pin, wpi.INPUT);
-
-		SENSOR_ID++;
 	}
 
 	readState() {
 		var motion_state = wpi.digitalRead(this.pin);
 		this.state = motion_state;
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
-	}
-
-	getState() {
-		return this.state;
-	}
-
-	getID() {
-		return this.id;
-	}
-}
-
-class Water {
-	constructor(pin) {
-		this.pin = pin;
-		this.state = 0;
-		this.id = SENSOR_ID;
-		wpi.pinMode(pin, wpi.INPUT);
-
-		SENSOR_ID++;
-	}
-
-	readState() {
-		var water_state = wpi.digitalRead(this.pin);
-		this.state = water_state;
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -211,17 +187,14 @@ class Water {
 class Vibration {
 	constructor(pin) {
 		this.pin = pin;
-		this.state = 0;
-		this.id = SENSOR_ID;
+		this.state = wpi.digitalRead(pin);
+		this.id = pin;
 		wpi.pinMode(pin, wpi.INPUT);
-
-		SENSOR_ID++;
 	}
 
 	readState() {
 		var vibration_state = wpi.digitalRead(this.pin);
 		this.state = vibration_state;
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -236,17 +209,14 @@ class Vibration {
 class Sound {
 	constructor(pin) {
 		this.pin = pin;
-		this.state = 0;
-		this.id = SENSOR_ID;
+		this.state = wpi.digitalRead(pin);
+		this.id = pin;
 		wpi.pinMode(pin, wpi.INPUT);
-
-		SENSOR_ID++;
 	}
 
 	readState() {
 		var sound_state = wpi.digitalRead(this.pin);
 		this.state = !sound_state;
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.state})
 	}
 
 	getState() {
@@ -262,10 +232,8 @@ class Ultrasonic {
 	constructor(trigpin, echopin) {
 		this.trigpin = trigpin;
 		this.echopin = echopin;
-		this.distance = 0;
-		this.id = SENSOR_ID;
-
-		SENSOR_ID++;
+		this.distance = this.readDistance();
+		this.id = pin;
 
 		wpi.pinMode(trigpin, wpi.OUTPUT);
 		wpi.pinMode(echopin, wpi.INPUT);
@@ -280,9 +248,7 @@ class Ultrasonic {
 
 		var pulse_start = wpi.pulseIn(this.echopin, 1);
 		var distance_cm = pulse_start / 2 / 29.1;
-		this.distance = distance_cm.toFixed(2);
-
-		JSON_PACKET.THINGS.push({"id": this.id, "state": this.distance})
+		return distance_cm.toFixed(2);
 	}
 
 	getDistance() {
@@ -301,37 +267,40 @@ class DHT {
 		this.sensor = sensor;
 		this.temp = 0;
 		this.humidity = 0;
-		// this.id = SENSOR_ID;
 
-		this.temp_id = SENSOR_ID;
-		this.humidity_id = SENSOR_ID + 1;
-
-		SENSOR_ID = SENSOR_ID+2;
+		this.temp_id = pin;
+		this.humidity_id = pin + 1;
 	}
 
-	readTemp() {
+	getTemp() {
 		return this.temp;
 	}
 
-	readHumidity() {
+	getHumidity() {
 		return this.humidity;
 	}
 
-	getID() {
-		return this.id;
+	getID(type) {
+		if (type === "temp") {
+			return this.temp_id;
+		} else if (type === "humidity") {
+			return this.humidity_id;
+		}
 	}
 
 	setTemp(temp) {
 		this.temp = temp;
 	}
 
+	setHumidity(humid) {
+		this.humidity = humid;
+	}
+
 	read() {
 		this.sensor.read(this.type, this.pin, (err, temperature, humidity) => {
 			if (!err) {
-				this.temp = temperature.toFixed(1);
-				this.humidity = humidity.toFixed(1);
-				JSON_PACKET.THINGS.push({"id": this.temp_id, "state": this.temp})
-				JSON_PACKET.THINGS.push({"id": this.humidity_id, "state": this.humidity})
+				this.setTemp(temperature.toFixed(1));
+				this.setHumidity(humidity.toFixed(1));
 			} else {
 				//handle the error somehow
 			}
@@ -339,29 +308,18 @@ class DHT {
 	}
 }
 
-function sendPacket(jsonpacket) {
-	var PACKET = compilePacket(jsonpacket);
-	console.log(PACKET);
-	//${FETCH_IP}/device/${DEVICE_ID}/sensor/${motion.getID()}/${motion.getState()}
 
-	fetch(`${FETCH_IP}/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET}).then(
-		() => console.log("SUCCESS")
-	).catch(
-		() => console.log("FAILURE")
-	)
-}
+//initiate devices
+//read components
+var led = new LED(7);
+var fan = new Fan(0);
+var fanz = new Fan(2);
 
-
-//initiate pins associated with device
-var newPin = new LED(7);
+//write components
 var touch = new Touch(3);
 var motion = new Motion(4);
 var uson = new Ultrasonic(29, 28);
-//dht uses bcm pin not wpi
-var dht = new DHT(26, dhtsensor, 11);
-var fan = new Fan(0);
-var fanz = new Fan(2);
-var water = new Water(6);
+var dht = new DHT(26, dhtsensor, 11); //dht uses bcm not wPi pin
 var vibration = new Vibration(5);
 var sound = new Sound(26)
 
@@ -369,23 +327,35 @@ setInterval(function() {
 	
 	console.log("----STARTED READING----");
 	console.log("-----------------------");
-	
+
+	led.fetchState();
+	fan.fetchState();
+	fanz.fetchState();
+
 	touch.readState();
 	motion.readState();
 	uson.readDistance();
 	dht.read();
-	newPin.fetchState();
+	led.fetchState();
 	fan.fetchState();
 	fanz.fetchState();	
 	water.readState();
 	vibration.readState();
 	sound.readState();
 
+	JSON_PACKET.THINGS.push({"id": touch.getID(), "state": touch.getState()})
+	JSON_PACKET.THINGS.push({"id": motion.getID(), "state": motion.getState()})
+	JSON_PACKET.THINGS.push({"id": vibration.getID(), "state": vibration.getState()})
+	JSON_PACKET.THINGS.push({"id": sound.getID(), "state": sound.getState()})
+	JSON_PACKET.THINGS.push({"id": uson.getID(), "state": uson.getState()})
+	JSON_PACKET.THINGS.push({"id": dht.getID("humid"), "state": dht.getHumidity()})
+	JSON_PACKET.THINGS.push({"id": dht.getID("humidity"), "state": dht.getTemp()})
+
 	console.log(`TOUCH: ${touch.getState()}`);
 	console.log(`MOTION: ${motion.getState()}`);
 	console.log(`USONIC: ${uson.getDistance()}`);
-	console.log(`TEMP: ${dht.readTemp()}`);
-	console.log(`HUMIDITY: ${dht.readHumidity()}`);
+	console.log(`TEMP: ${dht.getTemp()}`);
+	console.log(`HUMIDITY: ${dht.getHumidity()}`);
 	console.log(`WATER: ${water.getState()}`);
 	console.log(`FAN-1: ${fan.getState()}`);
 	console.log(`FAN-2: ${fanz.getState()}`);
@@ -395,8 +365,5 @@ setInterval(function() {
 	console.log("-----------------------");
 	console.log("----FINISHED READING----\n");
 
-	// console.log("----COMPILING PACKET----");
-	// console.log("------------------------");
 	sendPacket(JSON_PACKET);
-	// console.log("---FINISHED COMPILING---\n");
 }, 2000);
