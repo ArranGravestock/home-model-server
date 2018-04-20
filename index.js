@@ -18,12 +18,8 @@ var Fan = require("./components/fan");
 
 var config = require("./config.json");
 
-//set device defaults
-var DEVICE_ID = config.DEVICE_ID;
-var FETCH_IP = config.FETCH_IP;
-
 //initiate an empty packet
-var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}
+var JSON_PACKET = {"DEVICE_ID": config.DEVICE_ID, THINGS: []}
 
 function compilePacket(packet) {
 	var jsonPacket = JSON.stringify(JSON_PACKET)
@@ -38,7 +34,7 @@ function sendPacket(jsonpacket) {
 	var PACKET = compilePacket(jsonpacket);
 	console.log(PACKET);
 
-	fetch(`${FETCH_IP}/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET})
+	fetch(`${config.FETCH_IP}/reading`, {headers: { 'Content-Type': 'application/json' }, method: 'PUT', body: PACKET})
 	.then((res) => {
 		if(res.ok) {
 			console.log("SUCCESS")
