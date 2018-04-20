@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 
 //run setups
 var wpi = require('wiring-pi');
-var dhtsensor = require('node-dht-sensor');
 wpi.setup('wpi');
 
 //import classes
@@ -16,10 +15,11 @@ var Ultrasonic = require("./components/ultrasonic");
 var Vibration = require("./components/vibration");
 var Fan = require("./components/fan");
 
+var config = require("./config.json");
 
 //set device defaults
-var DEVICE_ID = "UBVXug97hdIAwOM";
-var FETCH_IP = "http://192.168.1.88:3000"
+var DEVICE_ID = config.DEVICE_ID;
+var FETCH_IP = config.FETCH_IP;
 
 //initiate an empty packet
 var JSON_PACKET = {"DEVICE_ID": DEVICE_ID, THINGS: []}

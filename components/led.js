@@ -1,7 +1,7 @@
 "use strict";
 var wpi = require('wiring-pi');
 const fetch = require('node-fetch');
-
+var config = require("./config.json");
 class LED {
 	constructor(pin) {
 		this.pin = pin;
@@ -50,4 +50,4 @@ class LED {
 	}
 }
 
-module.exports.LED = LED;
+module.exports = LED;

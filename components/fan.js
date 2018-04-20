@@ -1,6 +1,7 @@
 "use strict";
 var wpi = require('wiring-pi');
 const fetch = require('node-fetch');
+var config = require("./config.json");
 
 class Fan {
 	constructor(pin) {
