@@ -9,6 +9,7 @@ wpi.setup('wpi');
 var Touch = require("./components/touch");
 var LED = require("./components/led");
 var DHT = require("./components/dht");
+var dhtsensor = require("node-dht-sensor");
 var Motion = require("./components/motion");
 var Sound = require("./components/sound");
 var Ultrasonic = require("./components/ultrasonic");

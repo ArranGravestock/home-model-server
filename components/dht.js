@@ -1,6 +1,6 @@
 "use strict";
-var dhtsensor = require('node-dht-sensor');
 var wpi = require('wiring-pi');
+
 class DHT {
 	constructor(pin, sensor, type) {
 		this.pin = pin;

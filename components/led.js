@@ -1,7 +1,10 @@
 "use strict";
 var wpi = require('wiring-pi');
 const fetch = require('node-fetch');
-var config = require("./config.json");
+var config = require("../config.json");
+var FETCH_IP = config.FETCH_IP;
+var DEVICE_ID = config.DEVICE_ID;
+
 class LED {
 	constructor(pin) {
 		this.pin = pin;
