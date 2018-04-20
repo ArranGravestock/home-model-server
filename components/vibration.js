@@ -1,7 +1,7 @@
 "use strict";
 var wpi = require('wiring-pi');
 
-class Motion {
+class Vibration {
 	constructor(pin) {
 		this.pin = pin;
 		this.state = wpi.digitalRead(pin);
@@ -10,8 +10,8 @@ class Motion {
 	}
 
 	readState() {
-		var motion_state = wpi.digitalRead(this.pin);
-		this.state = motion_state;
+		var vibration_state = wpi.digitalRead(this.pin);
+		this.state = vibration_state;
 	}
 
 	getState() {
@@ -23,4 +23,4 @@ class Motion {
 	}
 }
 
-module.exports = Motion;
+module.exports = Vibration;

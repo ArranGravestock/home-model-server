@@ -1,13 +1,13 @@
 "use strict";
+var wpi = require('wiring-pi');
+const fetch = require('node-fetch');
 
 class LED {
 	constructor(pin) {
 		this.pin = pin;
-		this.id = SENSOR_ID;
+		this.id = pin;
 		this.state = this.fetchState();
 		wpi.pinMode(pin, wpi.OUTPUT);
-
-		SENSOR_ID++;
 	}
 
 	getState() {
@@ -20,13 +20,13 @@ class LED {
 	}
 
 	fetchState() {
-		fetch(`http://192.168.1.88:3000/device/${DEVICE_ID}/light/${this.id}`, 
+		fetch(`${FETCH_IP}/device/${DEVICE_ID}/type/light/${this.id}`, 
 			{
 				method: 'GET', 
 				credentials: 'include',
 				headers: {
 					'content-type':'application/json',
-					'Access-Control-Allow-Origin':'localhost:3001',
+					'access-control-allow-origin':'*'
 				}
 			}
 		)
