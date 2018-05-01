@@ -1,11 +1,7 @@
 # Server Home Model
 description
 
-## Installation for development
-Installation of raspbian pi
-
-Installation of node
-
+## Installation
 Requires BCM185 installation on the raspberry pi before hand
 
 then:
@@ -19,12 +15,18 @@ sudo node index.js
 ````
 
 ## Built with
-- [Expressjs](https://expressjs.com/) - Framework used
-- [Expresssession](https://github.com/expressjs/session) - Express Session for monitoring user sessions
+- [Node.js](https://nodejs.org/en/)
+- [Wiring-pi-node](https://github.com/WiringPi/WiringPi-Node)
 
 ## Dependencies
 ```
 
+```
+
+## Todo
+```
+-Initialise components through the database rather than through the server
+-Add better support for a wider range of components
 ```
 
 ## Authors
