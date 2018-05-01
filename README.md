@@ -20,7 +20,9 @@ sudo node index.js
 
 ## Dependencies
 ```
-
+"node-dht-sensor": "0.0.34",
+"node-fetch": "^2.1.2",
+"wiring-pi": "^2.2.1"
 ```
 
 ## Todo
