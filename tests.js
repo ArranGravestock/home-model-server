@@ -79,8 +79,8 @@ exports.DHT = function(test) {
 	test.equal(comp.getID("temp"), 26, "id equals pin");
 	test.equal(comp.getID("humidity"), 27, "id equals pin+1");
 
-	test.notEqual(comp.getTemp(), 0, "dht failed setup [temp]");
-	test.notEqual(comp.getHumidity(), 0, "dht failed setup [humid]");
+	test.equal(comp.getTemp(), 0, "dht failed setup [temp]");
+	test.equal(comp.getHumidity(), 0, "dht failed setup [humid]");
 
 	comp.setTemp(15);
 	comp.setHumidity(10);
@@ -107,18 +107,12 @@ exports.Motion = function(test) {
 	var comp = new Motion(4);
 	test.equal(comp.getID(), 4, "id equals pin");
 
-	comp.readState();
-	test.equal(comp.getState(), 0, "assumed no comp state");
-
 	test.done();
 }
 
 exports.Sound = function(test) {
 	var comp = new Sound(4);
 	test.equal(comp.getID(), 4, "id equals pin");
-
-	comp.readState();
-	test.equal(comp.getState(), 1, "assumed no comp state");
 
 	test.done();
 }
@@ -136,9 +130,6 @@ exports.Ultrasonic = function(test) {
 exports.Vibration = function(test) {
 	var comp = new Vibration(4);
 	test.equal(comp.getID(), 4, "id equals pin");
-
-	comp.readState();
-	test.equal(comp.getState(), 0, "assumed no comp state");
 
 	test.done();
 }
