@@ -2,7 +2,9 @@
 description
 
 ## Installation
-Requires BCM185 installation on the raspberry pi before hand
+Requires BCM2835 & wiring pi installation on the raspberry pi before hand, follow the instructions at:
+[airspayce bcm2835](http://www.airspayce.com/mikem/bcm2835/)
+[wiring pi](http://wiringpi.com/download-and-install/)
 
 then:
 Install dependencies:
@@ -11,8 +13,13 @@ npm install
 ```
 To run the server
 ```
-sudo node index.js
+node index.js
 ````
+
+To run tests
+```
+nodeunit tests.js
+```
 
 ## Built with
 - [Node.js](https://nodejs.org/en/)
