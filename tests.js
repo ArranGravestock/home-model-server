@@ -79,14 +79,13 @@ exports.DHT = function(test) {
 	test.equal(comp.getID("temp"), 26, "id equals pin");
 	test.equal(comp.getID("humidity"), 27, "id equals pin+1");
 
-	comp.read();
-	test.notEqual(comp.getTemp(), 0, "temp above 0");
-	test.notEqual(comp.getHumidity(), 0, "humidity above 0");
+	test.notEqual(comp.getTemp(), 0, "dht failed setup [temp]");
+	test.notEqual(comp.getHumidity(), 0, "dht failed setup [humid]");
 
-	comp.setHumidity(10);
 	comp.setTemp(15);
-	test.equal(comp.getTemp(), 10, "temp is 10");
-	test.equal(comp.getHumidity(), 15, "humidity is 15");
+	comp.setHumidity(10);
+	test.equal(comp.getTemp(), 15, "temp is 10");
+	test.equal(comp.getHumidity(), 10, "humidity is 15");
 
 	test.done();
 }
@@ -119,7 +118,7 @@ exports.Sound = function(test) {
 	test.equal(comp.getID(), 4, "id equals pin");
 
 	comp.readState();
-	test.equal(comp.getState(), 0, "assumed no comp state");
+	test.equal(comp.getState(), 1, "assumed no comp state");
 
 	test.done();
 }
