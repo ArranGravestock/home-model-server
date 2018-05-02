@@ -1,5 +1,5 @@
 # Server Home Model
-description
+The hub provides a hardware interface for acting between basic rpi components and raspberry pi, which also further adds the capability to send the data through the `home-model-api`, which can be used in a web client.
 
 ## Installation
 Requires BCM2835 & wiring pi installation on the raspberry pi before hand, follow the instructions at:
