@@ -27,7 +27,7 @@ To register a new component, in ```index.js```, create a new variable and instan
 var mynewfan = new Fan(9) //connected to wPi pin 9
 ```
 Each component is declared as follows: 
-```
+```javascript
 var led = new LED(<PIN>);
 var fan = new Fan(<PIN>);
 var touch = new Touch(<PIN>);
@@ -45,7 +45,7 @@ var dht = new DHT(<PIN>, dhtsensor, <DHT TYPE, 11 || 22>);
 - [Wiring-pi-node](https://github.com/WiringPi/WiringPi-Node)
 
 ## Dependencies
-```
+```json
 "node-dht-sensor": "0.0.34",
 "node-fetch": "^2.1.2",
 "wiring-pi": "^2.2.1"
