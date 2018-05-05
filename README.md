@@ -21,6 +21,25 @@ To run tests
 nodeunit tests.js
 ```
 
+## Registering new components
+To register a new component, in ```index.js```, create a new variable and instantiate it to the correct component choice, followed by the pin number e.g.
+```
+var mynewfan = new Fan(9) //connected to wPi pin 9
+```
+Each component is declared as follows: 
+```
+var led = new LED(<PIN>);
+var fan = new Fan(<PIN>);
+var touch = new Touch(<PIN>);
+var motion = new Motion(<PIN>);
+var vibration = new Vibration(<PIN>);
+var sound = new Sound(<PIN>)
+var uson = new Ultrasonic(<TRIG PIN>, <ECHO PIN>);
+
+//dht is defined by BCM pin, refer to http://wiringpi.com/pins/
+var dht = new DHT(<PIN>, dhtsensor, <DHT TYPE, 11 || 22>); 
+```
+
 ## Built with
 - [Node.js](https://nodejs.org/en/)
 - [Wiring-pi-node](https://github.com/WiringPi/WiringPi-Node)
