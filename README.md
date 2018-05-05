@@ -23,7 +23,7 @@ nodeunit tests.js
 
 ## Registering new components
 To register a new component, in ```index.js```, create a new variable and instantiate it to the correct component choice, followed by the pin number e.g.
-```
+```javascript
 var mynewfan = new Fan(9) //connected to wPi pin 9
 ```
 Each component is declared as follows: 
